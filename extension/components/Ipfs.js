@@ -27,8 +27,8 @@ class Ipfs extends Component {
             if(err){
                 console.log(err);
             } else {
-                console.log("Data: " + data);
-                return data;
+                console.log("Retrieving address: " + data.publicKey + " for domain: " + data.domainName);
+                return data.publicKey;
             }
         });
     }
