@@ -1,39 +1,15 @@
 import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
-const IPFS = require('ipfs-mini');
 
 class App extends Component  {
+  
   constructor(props){
     super(props)
-
-    this.state = {
-      domain: null,
-      domainHash: null,
-      domainData: null,
-      ipfs: null
-    }
+    this.state = {}
   }
 
-  componentWillMount(){
-    this.configureIPFS();
-  }
-
-  configureIPFS(){
-    const ipfs = new IPFS({host: 'ipfs.infura.io', port: 5001, protocol: 'https'});
-    this.setState({ipfs: ipfs});
-  }
-
-  readData(hashID){
-      this.props.ipfs.cat(hashID, (err, data) => {
-          if(err){
-              console.log(err);
-          } else {
-              this.setState({domainData: data});
-              console.log("Data: " + data);
-          }
-      });
-  }
+  componentWillMount(){}
 
   render(){
     return (
