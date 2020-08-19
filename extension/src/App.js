@@ -29,7 +29,7 @@ class App extends Component  {
           if(err){
               console.log(err);
           } else {
-              this.setState(domainData, data);
+              this.setState({domainData: data});
               console.log("Data: " + data);
           }
       });
