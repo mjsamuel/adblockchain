@@ -10,13 +10,13 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
-    "web3": "^1.2.11",
-    "webpack-extension-manifest-plugin": "^0.5.0"
+    "web3": "^1.2.11"
   },
   "scripts": {
-    "start": "NODE_ENV=development webpack --mode development --config webpack.js --watch",
-    "build": "NODE_ENV=development webpack --mode development --config webpack.js",
-    "test": "react-scripts test"
+    "start": "react-scripts start",
+    "build": "./script/build.sh",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -32,10 +32,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "copy-webpack-plugin": "^6.0.3",
-    "webpack": "^4.3.3",
-    "webpack-cli": "^3.3.12"
   }
 }
