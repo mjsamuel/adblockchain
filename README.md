@@ -45,6 +45,12 @@ To install the necessary node dependencies navigate to `/extension` and type:
 $ npm install
 ```
 
+#### Building the Extension (Live Reload)
+Navigate to `/extension` and run the following to build the source files as well as recompile whenever a file is changed :
+```
+$ npm run start
+```
+
 #### Building the Extension
 Navigate to `/extension` and run the following to build the source files:
 ```
@@ -54,6 +60,6 @@ $ npm run build
 #### Adding the Extension to Chrome
 Go to the address `chrome://extensions/` and enable '*Developer mode*' in the toolbar.
 
-Click on '*Load unpacked*' and select `/extension/dist`.
+Click on '*Load unpacked*' and select `/extension/build`.
 
-The `dist` folder should now be linked such that every time you run the build command the extension it should be updated automatically.
+The `build` folder should now be linked such that every time you run the build command the extension should be updated automatically.
