@@ -1,18 +1,20 @@
 import React from 'react';
 import logo from './images/logo.svg';
 import './css/App.css';
+import Ipfs from '../data/Ipfs.js';
 
+class App extends Component {
 
-class App extends Component  {
-  
-  constructor(props){
+  constructor(props) {
     super(props)
+    this.ipfs = new Ipfs(this);
+    this.ipfs.addDomain("hi", "hi", "hi");
     this.state = {}
   }
 
-  componentWillMount(){}
+  componentWillMount() { }
 
-  render(){
+  render() {
     return (
       <div className="App">
         <header className="App-header">
@@ -33,7 +35,7 @@ class App extends Component  {
       </div>
     );
   }
-  
+
 }
 
 export default App;
