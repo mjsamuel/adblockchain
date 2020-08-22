@@ -131,3 +131,6 @@ Temporary Items
 
 # Truffle
 build/
+
+# Data
+extension/data/domain_data.csv
