@@ -14,7 +14,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 });
 
 /**
- * Prints the public address of all accounts in the blockchain
+ * Generates an Ethereum account  
  * @return {Object} - the account object containing their public and private key
  */
 function createAccount() {
