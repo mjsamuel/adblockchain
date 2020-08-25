@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import logo from './images/logo.svg';
 import './css/App.css';
 import Ipfs from '../data/Ipfs.js';
@@ -7,12 +7,13 @@ class App extends Component {
 
   constructor(props) {
     super(props)
-    this.ipfs = new Ipfs(this);
-    this.ipfs.addDomain("hi", "hi", "hi");
+    this.ipfs = new Ipfs();
     this.state = {}
   }
 
-  componentWillMount() { }
+  componentDidMount() {
+    this.ipfs.addDomain("test", "123", "456");
+  }
 
   render() {
     return (
