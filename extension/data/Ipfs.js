@@ -1,19 +1,11 @@
-import React from "react";
 const IPFS = require('ipfs-mini');
 const csv = require('csv-parser');
-const fs = require('fs');
-const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const fs = require('browserify-fs');
 
 class Ipfs {
     constructor() {
         this.ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
-        this.csvWriter = createCsvWriter({
-            path: 'domain_data.csv',
-            header: [
-                { id: 'domain', title: 'Domain' },
-                { id: 'address', title: 'Hash' },
-            ]
-        });
+        this.recordsPath = "records.csv";
     }
 
     getAddress(domainName) {
@@ -38,7 +30,7 @@ class Ipfs {
                 console.log(err);
             } else {
                 console.log("Generated hash: " + hash)
-                this._storeDomainHash(domainName, hash)
+                this._createRecord(domainName, hash)
             }
         })
     }
@@ -56,9 +48,15 @@ class Ipfs {
         console.log('Failed to find hash address for domain: %s', domainName);
     }
 
-    _storeDomainHash(domainName, hashAddress) {
-        const domainData = [{ domain: domainName, address: hashAddress }]
-        this.csvWriter.writeRecords(domainData).then(() => console.log('Appended domain: %s to CSV file.', domainName))
+    _createRecord(domainName, hashAddress) {
+        const newRecord = domainName.concat(",", hashAddress);
+        fs.appendFile("records.csv", newRecord, (err) => {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log('Appended new record: %s', newRecord)
+            }
+        });
     }
 }
 
