@@ -5,8 +5,7 @@ const fs = require('fs');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 class Ipfs {
-    constructor(component) {
-        this.component = component;
+    constructor() {
         this.ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
         this.csvWriter = createCsvWriter({
             path: 'domain_data.csv',
@@ -31,13 +30,10 @@ class Ipfs {
     }
 
     addDomain(domainName, publicKey, privateKey) {
-        const domainData = JSON.parse({
-            domainName: domainName,
-            publicKey: publicKey,
-            privateKey: privateKey
-        });
+        const domainData = JSON.stringify({ "domainName": domainName, "publicKey": publicKey, "privateKey": privateKey });
+        const dataObject = JSON.parse(domainData);
 
-        this.ipfs.addJSON(domainData, (err, hash) => {
+        this.ipfs.addJSON(dataObject, (err, hash) => {
             if (err) {
                 console.log(err);
             } else {
