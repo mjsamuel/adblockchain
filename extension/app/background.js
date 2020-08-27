@@ -1,4 +1,4 @@
-import './ethereum.js';
+const eth = require('./ethereum.js');
 
 /**
  * Listens for whenever a tab changes
