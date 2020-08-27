@@ -16,7 +16,7 @@
   "scripts": {
     "start": "NODE_ENV=development webpack --mode development --config webpack.js --watch",
     "build": "NODE_ENV=development webpack --mode development --config webpack.js",
-    "test": "jest --passWithNoTests ./tests"
+    "test": "jest ./tests"
   },
   "eslintConfig": {
     "extends": "react-app"

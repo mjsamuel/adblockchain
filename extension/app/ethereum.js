@@ -9,7 +9,7 @@ var web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
  */
 export function createAccount() {
   let account = web3.eth.accounts.create();
-  return account
+  return account;
 }
 
 /**
@@ -19,27 +19,29 @@ export function createAccount() {
  * @param {Number} amount - the amount of money to be transferred in ETH
  */
 export function transferFunds(userAddress, creatorAddress, amount) {
-  // Converting from wei to ETH
-  amount = getEth(amount)
+  // Converting from ETH to wei
+  amount = getEth(amount);
 
   // Sending the funds
   web3.eth.sendTransaction({
-    to: userAddress,
-    from: creatorAddress,
-    value: amount
-  }).then(transactionDetails => {
-    console.log(transactionDetails)
-  })
+      to: userAddress,
+      from: creatorAddress,
+      value: amount
+    }).then(transactionDetails => {
+      console.log(transactionDetails)
+    }).catch(error => {
+      console.log(error)
+    });
 }
 
 /**
- * Converts ETH to wei
+ * Gets an ammount of ETH in wei
  * @param {Int} amount - The amount of ETH to be returned
  * @return {Int} - An ammount of ETH in wei
  */
-function getEth(amount) {
-  let eth = amount * Math.pow(10, 18)
-  return eth
+export function getEth(amount) {
+  let eth = amount * Math.pow(10, 18);
+  return eth;
 }
 
 /**
@@ -50,6 +52,7 @@ export function listAccounts() {
   web3.eth.getAccounts()
     .then(fetchedAccounts=> {
       console.log(fetchedAccounts);
+    }).catch(error => {
+      console.log(error)
     });
 }
-

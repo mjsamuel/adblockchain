@@ -1,5 +1,11 @@
-const background = require('../app/ethereum.js');
+const eth = require('../app/ethereum.js');
 
-test('Example test to pass', () => {
-  expect(true);
+describe('ethereum.js', () => {
+
+  test('getEth() converts 4 ETH to wei', () => {
+    let expectedValue = 4 * Math.pow(10, 18);
+    expect(eth.getEth(4)).toBe(expectedValue);
+  });
+
 });
+
