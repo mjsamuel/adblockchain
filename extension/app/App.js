@@ -13,6 +13,7 @@ class App extends Component {
 
   componentDidMount() {
     this.ipfs.addDomain("test", "123", "456");
+    this.ipfs.getAddress("asdf")
   }
 
   render() {

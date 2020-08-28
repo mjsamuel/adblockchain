@@ -9,14 +9,13 @@ class Ipfs {
     }
 
     getAddress(domainName) {
-        const hashAddress = this._retrieveHashAddress(domainName);
-
-        this.ipfs.cat(hashAddress, (err, data) => {
+        this.ipfs.cat('QmWrn6iHUgTkrXZndeSfoq8fDyVWfNs8PhrPRXB2p8DZoQ', (err, result) => {
             if (err) {
                 console.log(err);
             } else {
-                console.log("Retrieving address: " + data.publicKey + " for domain: " + data.domainName);
-                return data.publicKey;
+                const returnedData = JSON.parse(result)
+                console.log("Retrieving address: " + returnedData.publicKey + " for domain: " + returnedData.domainName);
+
             }
         });
     }
@@ -30,34 +29,10 @@ class Ipfs {
                 console.log(err);
             } else {
                 console.log("Generated hash: " + hash)
-                this._createRecord(domainName, hash)
             }
         })
     }
 
-    _retrieveHashAddress(domainName) {
-        fs.createReadStream('domain_data.csv').
-            pipe(csv()).
-            on('data', (row) => {
-                if (row.domain == domainName) {
-                    console.log('Parsed hash address for domain: %s', domainName);
-                    return row.address;
-                }
-            });
-
-        console.log('Failed to find hash address for domain: %s', domainName);
-    }
-
-    _createRecord(domainName, hashAddress) {
-        const newRecord = domainName.concat(",", hashAddress);
-        fs.appendFile("records.csv", newRecord, (err) => {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log('Appended new record: %s', newRecord)
-            }
-        });
-    }
 }
 
 export default Ipfs;
