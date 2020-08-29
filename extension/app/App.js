@@ -11,9 +11,12 @@ class App extends Component {
     this.state = {}
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    // Example adding domain, publicKey, privateKey
     this.ipfs.addDomain("test", "123", "456");
-    this.ipfs.getAddress("asdf")
+
+    // Example retrieving address
+    const publickey = await this.ipfs.getAddress("youtube");
   }
 
   render() {
