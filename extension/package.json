@@ -10,6 +10,8 @@
     "fs": "0.0.1-security",
     "ipfs-api": "^26.1.2",
     "ipfs-mini": "^1.1.5",
+    "ipns": "^0.8.0",
+    "libp2p-crypto": "^0.18.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
