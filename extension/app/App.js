@@ -14,9 +14,9 @@ class App extends Component {
   async componentDidMount() {
 
     // // Example adding domain, publicKey, privateKey
-    // this.ipfs.addDomain("asdfdasf", "asdfdasf", "asdfdas");
+    this.ipfs.addDomain("asdfdasf", "asdfdasf", "asdfdas");
 
-    this.ipfs.storeHash("QmW11ntemu567QrdYaqARgYoy5yJt2Gg9iGsrYMYK9CLjj")
+    // this.ipfs.storeHash("QmW11ntemu567QrdYaqARgYoy5yJt2Gg9iGsrYMYK9CLjj")
 
     // // Example retrieving address
     // const publickey = await this.ipfs.getAddress("youtube");

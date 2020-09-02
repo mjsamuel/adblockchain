@@ -1,11 +1,11 @@
-const IPFS = require('ipfs-mini');
-const ipns = require('ipns')
-const crypto = require('libp2p-crypto')
+const ipfsClient = require('ipfs-http-client');
+const decoder = new TextDecoder('utf-8');
 
 class Ipfs {
     constructor() {
-        this.ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
-        this.validator = ipns.validator
+        this.ipfs = ipfsClient({ host: 'localhost', port: 5001, protocol: 'http' });
+        this.ipnsAddress = '/ipns/QmbRUQwYjM96jgMjjJpxiTasVYq8z6i4PxBXrmAaYqDHGA';
+        this.ipnsKey = 'QmbRUQwYjM96jgMjjJpxiTasVYq8z6i4PxBXrmAaYqDHGA';
     }
 
     async getAddress(domainName) {
@@ -18,55 +18,75 @@ class Ipfs {
             .catch(console.error)
             .then(data => JSON.parse(data));
 
-        console.log('Retrieved address for %s', returnedData.domainName)
+        console.log('Retrieved address for %s', returnedData.domainName);
         return returnedData.publicKey;
     }
 
     async addDomain(domainName, publicKey, privateKey) {
-        // Convert data into JSON object.
+        // Create domain data as JSON string
         const domainData = JSON.stringify({ "domainName": domainName, "publicKey": publicKey, "privateKey": privateKey });
-        const dataObject = JSON.parse(domainData);
 
-        // Wait for data object to be added to IPFS 
-        console.log('Adding domain...')
-        await this.ipfs.addJSON(dataObject)
+        // Wait for the data to be added to ipfs and store the returned hash address
+        const hashAddress = await this.ipfs.add(domainData)
             .catch(console.error)
-            .then(hash => console.log('Generated hash: %s', hash));
+            .then(hash => console.log('Generated hash %s', hash));
+
+        // Afterwards store the hash address in IPNS
+        this.storeHash(domainName, hashAddress);
     }
 
-    async storeHash(hashAddress) {
-        // Retrieve current data
+    // Function retrieves the most recent revision of the domain hash data using IPNS
+    async retrieveLatestHashData() {
+        // Retrieve the address of the most recent file version
+        var ipfsAddress;
+        for await (const name of ipfs.name.resolve(this.ipnsAddress)) {
+            ipfsAddress = name;
+        }
 
-        // Create temp JSON object with new data appended
+        // Retreive data from IPFS
+        const source = ipfs.cat(ipfsAddress);
+        var data;
+        for await (const chunk of source) {
+            data += decoder.decode(chunk, { stream: true });
+        }
 
-        // Add new data to IPFS
+        return data;
+    }
 
-        // Generate key pair
+    async storeHash(domainName, hashAddress) {
+        // JSON string containing the data of the newest domain
+        const hashData = JSON.stringify({ "domainName": domainName, "hashAddress": hashAddress });
 
-        // Publish data to IPNS
+        // Retrieve the existing domain hash data as a JSON object
+        const existingData = JSON.parse(this.retrieveLatestHashData());
 
+        // Append the new hash to the existing data, and then convert it to a JSON string
+        const latestData = JSON.stringify(existingData.push(JSON.parse(hashData)));
 
+        // Add latest hash data to IPFS
+        const latestAddress = await this.ipfs.add(latestData)
+            .catch(console.error)
+            .then(hash => console.log('Appended new data to address: %s', hash))
 
-        const keyPair = await crypto.keys.generateKeyPair('RSA', 1024);
-
-        const ipnsEntry = await ipns.create(keyPair, hashAddress, 4, 33333);
-
-        await this.validator.validate(ipns.marshal(ipnsEntry), keyPair).catch(console.error).then(result => console.log(result))
-        // const result = await ipns.validate(keyPair, ipnsEntry).catch(console.error).then(test => console.log(test));
-
-
-        // const result = await ipns.validate(keyPair, entry);
-        // console.log(result)
-
-
-
-        // await ipns.create()
-        // TODO: ipns
+        // Publish the address to IPNS to update the pointer to the latest data
+        const ipfsAddress = '/ipfs/' + latestAddress;
+        const ipnsOptions = { 'allowOffline': true, 'key': this.ipnsKey };
+        await this.ipfs.name.publish(ipfsAddress, ipnsOptions)
+            .catch(console.error).
+            then(console.log('Successfully updated IPNS pointer.'))
     }
 
     async retrieveHash(domainName) {
-        // TODO: ipns
-        return "QmWrn6iHUgTkrXZndeSfoq8fDyVWfNs8PhrPRXB2p8DZoQ";
+        // Retrieve the existing hash data and access
+        const existingData = JSON.parse(this.retrieveLatestHashData());
+
+        // const hashAddress = existingData[domainName];
+
+        // if (hashAddress == undefined) {
+        //     throw 'Failed to find hash address for given domain: ' + domainName;
+        // } else {
+        //     return hashAddress;
+        // }
     }
 }
 
