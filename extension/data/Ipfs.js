@@ -1,11 +1,11 @@
 const ipfsClient = require('ipfs-http-client');
+const ipfs = ipfsClient({ host: 'localhost', port: 5001, protocol: 'http' });
 const decoder = new TextDecoder('utf-8');
 
 class Ipfs {
     constructor() {
-        this.ipfs = ipfsClient({ host: 'localhost', port: 5001, protocol: 'http' });
-        this.ipnsAddress = '/ipns/QmbRUQwYjM96jgMjjJpxiTasVYq8z6i4PxBXrmAaYqDHGA';
-        this.ipnsKey = 'QmbRUQwYjM96jgMjjJpxiTasVYq8z6i4PxBXrmAaYqDHGA';
+        this.ipnsAddress = '/ipns/QmWt5NiTyRwWWJy8EA12VuPvuvgGn8g3265FRahKTpwo6o';
+        this.ipnsKey = 'QmWt5NiTyRwWWJy8EA12VuPvuvgGn8g3265FRahKTpwo6o';
     }
 
     async getAddress(domainName) {
@@ -14,7 +14,7 @@ class Ipfs {
 
         // Retrieve and parse data into JSON object
         console.log('Retrieving address...');
-        const returnedData = await this.ipfs.cat(targetHash)
+        const returnedData = await ipfs.cat(targetHash)
             .catch(console.error)
             .then(data => JSON.parse(data));
 
@@ -27,9 +27,11 @@ class Ipfs {
         const domainData = JSON.stringify({ "domainName": domainName, "publicKey": publicKey, "privateKey": privateKey });
 
         // Wait for the data to be added to ipfs and store the returned hash address
-        const hashAddress = await this.ipfs.add(domainData)
+        const hashAddress = await ipfs.add(domainData)
             .catch(console.error)
-            .then(hash => console.log('Generated hash %s', hash));
+            .then(hash => hash.path);
+
+        console.log('Generated hash: %s', hashAddress);
 
         // Afterwards store the hash address in IPNS
         this.storeHash(domainName, hashAddress);
@@ -50,6 +52,8 @@ class Ipfs {
             data += decoder.decode(chunk, { stream: true });
         }
 
+        console.log(data);
+
         return data;
     }
 
@@ -58,22 +62,23 @@ class Ipfs {
         const hashData = JSON.stringify({ "domainName": domainName, "hashAddress": hashAddress });
 
         // Retrieve the existing domain hash data as a JSON object
-        const existingData = JSON.parse(this.retrieveLatestHashData());
+        // const existingData = JSON.parse(this.retrieveLatestHashData());
 
-        // Append the new hash to the existing data, and then convert it to a JSON string
-        const latestData = JSON.stringify(existingData.push(JSON.parse(hashData)));
+        // const data = await this.retrieveLatestHashData();
+        // console.log(data);
 
-        // Add latest hash data to IPFS
-        const latestAddress = await this.ipfs.add(latestData)
+        // // Append the new hash to the existing data, and then convert it to a JSON string
+        // const latestData = JSON.stringify(existingData.push(JSON.parse(hashData)));
+        const latestAddress = await ipfs.add(hashData)
             .catch(console.error)
-            .then(hash => console.log('Appended new data to address: %s', hash))
+            .then(hash => hash.path)
+
+        console.log('Appended new data to address: %s', latestAddress)
 
         // Publish the address to IPNS to update the pointer to the latest data
         const ipfsAddress = '/ipfs/' + latestAddress;
         const ipnsOptions = { 'allowOffline': true, 'key': this.ipnsKey };
-        await this.ipfs.name.publish(ipfsAddress, ipnsOptions)
-            .catch(console.error).
-            then(console.log('Successfully updated IPNS pointer.'))
+        await ipfs.name.publish(ipfsAddress, ipnsOptions).catch(console).then('Published hash address.');
     }
 
     async retrieveHash(domainName) {

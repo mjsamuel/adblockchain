@@ -9,7 +9,7 @@
     "csv-writer": "^1.6.0",
     "fs": "0.0.1-security",
     "ipfs-api": "^26.1.2",
-    "ipfs-http-client": "^46.0.1",
+    "ipfs-http-client": "^46.1.0",
     "libp2p-crypto": "^0.18.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
