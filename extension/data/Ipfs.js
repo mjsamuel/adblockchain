@@ -12,14 +12,17 @@ class Ipfs {
         // Retrieve hash based on domain
         const targetHash = await this.retrieveHash(domainName);
 
-        // Retrieve and parse data into JSON object
-        console.log('Retrieving address...');
-        const returnedData = await ipfs.cat(targetHash)
-            .catch(console.error)
-            .then(data => JSON.parse(data));
+        // Retrieve and decode data from retrieved hash
+        const source = await ipfs.cat(targetHash);
+        var data = new String();
+        for await (const chunk of source) {
+            data += decoder.decode(chunk, { stream: true });
+        }
 
-        console.log('Retrieved address for %s', returnedData.domainName);
-        return returnedData.publicKey;
+        console.log('Retrieved address for domain: %s', domainName);
+
+        // Return the public key of the data
+        return JSON.parse(data).publicKey;
     }
 
     async addDomain(domainName, publicKey, privateKey) {
@@ -46,7 +49,7 @@ class Ipfs {
         }
 
         // Retreive data from IPFS
-        const source = ipfs.cat(ipfsAddress);
+        const source = await ipfs.cat(ipfsAddress);
         var data = new String();
         for await (const chunk of source) {
             data += decoder.decode(chunk, { stream: true });
@@ -89,13 +92,19 @@ class Ipfs {
         // Retrieve the existing hash data and access
         const existingData = await this.retrieveLatestHashData();
 
-        // const hashAddress = existingData[domainName];
+        // Retrieve all hash data for all domains as an array
+        const allDomains = existingData.addresses;
 
-        // if (hashAddress == undefined) {
-        //     throw 'Failed to find hash address for given domain: ' + domainName;
-        // } else {
-        //     return hashAddress;
-        // }
+        // Iterate over the array until the target domain is found
+        for (let step = 0; step < allDomains.length; step++) {
+            // If found return the hash address
+            if (allDomains[step].domainName == domainName) {
+                return allDomains[step].hashAddress;
+            }
+        }
+
+        // If nothing is found, then throw an error
+        throw "No record found for domain: " + domainName;
     }
 }
 
