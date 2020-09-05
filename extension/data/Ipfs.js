@@ -47,29 +47,31 @@ class Ipfs {
 
         // Retreive data from IPFS
         const source = ipfs.cat(ipfsAddress);
-        var data;
+        var data = new String();
         for await (const chunk of source) {
             data += decoder.decode(chunk, { stream: true });
         }
 
-        console.log(data);
+        // Quick work-around for JSON string data being prefixed with 'undefined'
+        if (data.startsWith("undefined")) {
+            data = data.replace("undefined", "");
+        }
 
+        console.log('Retrieved lastest hash data: %s', data);
         return data;
     }
 
     async storeHash(domainName, hashAddress) {
-        // JSON string containing the data of the newest domain
         const hashData = JSON.stringify({ "domainName": domainName, "hashAddress": hashAddress });
 
         // Retrieve the existing domain hash data as a JSON object
-        // const existingData = JSON.parse(this.retrieveLatestHashData());
+        const existingData = await this.retrieveLatestHashData();
 
-        // const data = await this.retrieveLatestHashData();
-        // console.log(data);
+        // Append new data
+        // const latestData = "{" + existingData + "," + hashData + "}";
 
-        // // Append the new hash to the existing data, and then convert it to a JSON string
-        // const latestData = JSON.stringify(existingData.push(JSON.parse(hashData)));
-        const latestAddress = await ipfs.add(hashData)
+        // Append the new hash to the existing data, and then convert it to a JSON string
+        const latestAddress = await ipfs.add(latestData)
             .catch(console.error)
             .then(hash => hash.path)
 
@@ -78,12 +80,12 @@ class Ipfs {
         // Publish the address to IPNS to update the pointer to the latest data
         const ipfsAddress = '/ipfs/' + latestAddress;
         const ipnsOptions = { 'allowOffline': true, 'key': this.ipnsKey };
-        await ipfs.name.publish(ipfsAddress, ipnsOptions).catch(console).then('Published hash address.');
+        await ipfs.name.publish(ipfsAddress, ipnsOptions).catch(console).then(res => console.log('Published to IPNS: /ipns/%s', res.name));
     }
 
     async retrieveHash(domainName) {
         // Retrieve the existing hash data and access
-        const existingData = JSON.parse(this.retrieveLatestHashData());
+        const existingData = await this.retrieveLatestHashData();
 
         // const hashAddress = existingData[domainName];
 
