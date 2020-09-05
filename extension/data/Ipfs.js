@@ -14,7 +14,7 @@ class Ipfs {
 
         // Retrieve and decode data from retrieved hash
         const source = await ipfs.cat(targetHash);
-        var data = new String();
+        var data;
         for await (const chunk of source) {
             data += decoder.decode(chunk, { stream: true });
         }
@@ -50,18 +50,14 @@ class Ipfs {
 
         // Retreive data from IPFS
         const source = await ipfs.cat(ipfsAddress);
-        var data = new String();
+        var data;
         for await (const chunk of source) {
             data += decoder.decode(chunk, { stream: true });
         }
 
-        // Quick work-around for JSON string data being prefixed with 'undefined'
-        if (data.startsWith("undefined")) {
-            data = data.replace("undefined", "");
-        }
-
         console.log('Retrieved lastest hash data: %s', data);
 
+        // Return the data as a JSON object.
         return JSON.parse(data);
     }
 

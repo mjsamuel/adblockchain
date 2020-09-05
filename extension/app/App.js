@@ -19,7 +19,7 @@ class App extends Component {
     // this.ipfs.addDomain("asfsa", "pubkey", "privkey");
     // const data = await this.ipfs.retrieveLatestHashData();
     // console.log(data);
-    const data = await this.ipfs.getAddress("asfsa");
+    const data = await this.ipfs.retrieveLatestHashData();
     console.log(data);
 
 
