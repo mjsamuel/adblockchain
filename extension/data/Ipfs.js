@@ -58,20 +58,22 @@ class Ipfs {
         }
 
         console.log('Retrieved lastest hash data: %s', data);
-        return data;
+
+        return JSON.parse(data);
     }
 
     async storeHash(domainName, hashAddress) {
-        const hashData = JSON.stringify({ "domainName": domainName, "hashAddress": hashAddress });
+        // New hash entry
+        const newHashData = { "domainName": domainName, "hashAddress": hashAddress };
 
         // Retrieve the existing domain hash data as a JSON object
-        const existingData = await this.retrieveLatestHashData();
+        const hashData = await this.retrieveLatestHashData();
 
-        // Append new data
-        // const latestData = "{" + existingData + "," + hashData + "}";
+        // Append new data to the existing data
+        hashData.addresses.push(newHashData);
 
-        // Append the new hash to the existing data, and then convert it to a JSON string
-        const latestAddress = await ipfs.add(latestData)
+        // Convert the data to a JSON string and add it to IPFS
+        const latestAddress = await ipfs.add(JSON.stringify(hashData))
             .catch(console.error)
             .then(hash => hash.path)
 

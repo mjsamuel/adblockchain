@@ -14,9 +14,11 @@ class App extends Component {
   async componentDidMount() {
 
     // // Example adding domain, publicKey, privateKey
-    // this.ipfs.addDomain("adfdsafasdfa", "pubkey", "privkey");
-    // this.ipfs.addDomain("otherDomain", "pubkey", "privkey");
-    this.ipfs.retrieveLatestHashData();
+
+    // this.ipfs.addDomain("newDomanToadd", "pubkey", "privkey");
+    // this.ipfs.addDomain("asfsa", "pubkey", "privkey");
+    const data = await this.ipfs.retrieveLatestHashData();
+    console.log(data);
 
 
 
