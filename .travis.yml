@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+  - 12
+
+cache: npm
+
+before_install:
+  - cd extension
+
+install:
+  - npm install
