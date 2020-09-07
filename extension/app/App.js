@@ -1,18 +1,25 @@
-import React from 'react';
+import React, { Component } from 'react';
 import logo from './images/logo.svg';
 import './css/App.css';
+import Ipfs from '../data/Ipfs.js';
 
+class App extends Component {
 
-class App extends Component  {
-  
-  constructor(props){
+  constructor(props) {
     super(props)
+    this.ipfs = new Ipfs();
     this.state = {}
   }
 
-  componentWillMount(){}
+  async componentDidMount() {
 
-  render(){
+    // // Example adding domain, publicKey, privateKey
+    // this.ipfs.addDomain("newDomanToadd", "pubkey", "privkey");
+    // this.ipfs.addDomain("asfsa", "pubkey", "privkey");
+    this.ipfs.getAddress("asfsa");
+  }
+
+  render() {
     return (
       <div className="App">
         <header className="App-header">
@@ -33,7 +40,7 @@ class App extends Component  {
       </div>
     );
   }
-  
+
 }
 
 export default App;
