@@ -33,7 +33,7 @@ const config = {
     }),
     new CopyPlugin({
       patterns: [
-        {from: 'app/images', to: 'app/images'},
+        {from: 'app/images', to: 'images'},
         {from: 'app/css', to: 'css'}
       ]
     }),

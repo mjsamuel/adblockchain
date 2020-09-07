@@ -16,7 +16,7 @@
   "scripts": {
     "start": "NODE_ENV=development webpack --mode development --config webpack.js --watch",
     "build": "NODE_ENV=development webpack --mode development --config webpack.js",
-    "test": "react-scripts test"
+    "test": "jest ./tests"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "copy-webpack-plugin": "^6.0.3",
+    "jest": "^26.4.2",
     "webpack": "^4.3.3",
     "webpack-cli": "^3.3.12"
   }
