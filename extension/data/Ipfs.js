@@ -6,20 +6,19 @@ class Ipfs {
     constructor() {
         this.ipnsAddress = '/ipns/QmWt5NiTyRwWWJy8EA12VuPvuvgGn8g3265FRahKTpwo6o';
         this.ipnsKey = 'QmWt5NiTyRwWWJy8EA12VuPvuvgGn8g3265FRahKTpwo6o';
+        this.emptyDataStructure = JSON.stringify({
+            addresses: []
+        });
     }
 
     async getAddress(domainName) {
-        // Retrieve hash based on domain
+        // Retrieve hash based on target domain
         const targetHash = await this.retrieveHash(domainName);
 
         // Retrieve and decode data from retrieved hash
-        const source = await ipfs.cat(targetHash);
-        var data;
-        for await (const chunk of source) {
-            data += decoder.decode(chunk, { stream: true });
-        }
-
-        console.log('Retrieved address for domain: %s', domainName);
+        var data = await this.readData(targetHash)
+            .catch(console.error)
+            .then(console.log('Retrieved address for domain: %s', domainName));
 
         // Return the public key of the data
         return JSON.parse(data).publicKey;
@@ -48,14 +47,18 @@ class Ipfs {
             ipfsAddress = name;
         }
 
-        // Retreive data from IPFS
-        const source = await ipfs.cat(ipfsAddress);
+        // Attempt to decode the source.
+        // Because IPNS data lasts for 24hrs only, the code below enclosed in try statement will fail and throw an error
+        // if the cat operation returns nothing.
         var data;
-        for await (const chunk of source) {
-            data += decoder.decode(chunk, { stream: true });
+        try {
+            data = await this.readData(ipfsAddress);
+            console.log('Retrieved lastest hash data: %s', data);
         }
-
-        console.log('Retrieved lastest hash data: %s', data);
+        // If this happens catch the error and set data = an empty data structure
+        catch (err) {
+            data = this.emptyDataStructure;
+        }
 
         // Return the data as a JSON object.
         return JSON.parse(data);
@@ -81,7 +84,9 @@ class Ipfs {
         // Publish the address to IPNS to update the pointer to the latest data
         const ipfsAddress = '/ipfs/' + latestAddress;
         const ipnsOptions = { 'allowOffline': true, 'key': this.ipnsKey };
-        await ipfs.name.publish(ipfsAddress, ipnsOptions).catch(console).then(res => console.log('Published to IPNS: /ipns/%s', res.name));
+        await ipfs.name.publish(ipfsAddress, ipnsOptions)
+            .catch(console)
+            .then(res => console.log('Published to IPNS: /ipns/%s', res.name));
     }
 
     async retrieveHash(domainName) {
@@ -101,6 +106,25 @@ class Ipfs {
 
         // If nothing is found, then throw an error
         throw "No record found for domain: " + domainName;
+    }
+
+    async readData(hashAddress) {
+        // Retrieve data from IPFS
+        const source = await ipfs.cat(hashAddress);
+        var data = "";
+
+        // Decode data into string
+        for await (const chunk of source) {
+            data += decoder.decode(chunk, { stream: true });
+        }
+
+        // Data returned is prefixed with 'undefined' for an unknown reason
+        // This removes it so the data can be used
+        if (data.startsWith("undefined")) {
+            data = data.replace("undefined", "");
+        }
+
+        return data;
     }
 }
 

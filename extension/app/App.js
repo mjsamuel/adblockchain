@@ -14,20 +14,9 @@ class App extends Component {
   async componentDidMount() {
 
     // // Example adding domain, publicKey, privateKey
-
     // this.ipfs.addDomain("newDomanToadd", "pubkey", "privkey");
     // this.ipfs.addDomain("asfsa", "pubkey", "privkey");
-    // const data = await this.ipfs.retrieveLatestHashData();
-    // console.log(data);
-    const data = await this.ipfs.retrieveLatestHashData();
-    console.log(data);
-
-
-
-    // this.ipfs.storeHash("QmW11ntemu567QrdYaqARgYoy5yJt2Gg9iGsrYMYK9CLjj")
-
-    // // Example retrieving address
-    // const publickey = await this.ipfs.getAddress("youtube");
+    this.ipfs.getAddress("asfsa");
   }
 
   render() {
