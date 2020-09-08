@@ -1,17 +1,7 @@
-// const eth = require('./services/ethereum.js');
-// const ipfs = require('./services/ipfs.js');
-
 import { Ethereum } from './services/ethereum.js'
-var eth 
 import { IPFS } from './services/ipfs.js'
-var ipfs 
-
-setup()
-
-function setup() {
-  eth = new Ethereum()
-  ipfs = new IPFS() 
-}
+var eth = new Ethereum()
+var ipfs = new IPFS()
 
 /**
  * Listens for whenever a tab changes
@@ -73,5 +63,3 @@ function filterUrl(url) {
 // Exporting modules to be accessible from the Chrome console
 window.eth = eth
 window.ipfs = ipfs
-
-
