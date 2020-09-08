@@ -1,22 +1,16 @@
 import React, { Component } from 'react';
 import logo from './images/logo.svg';
 import './css/App.css';
-import Ipfs from '../data/Ipfs.js';
 
 class App extends Component {
 
   constructor(props) {
     super(props)
-    this.ipfs = new Ipfs();
     this.state = {}
   }
 
   async componentDidMount() {
-
-    // // Example adding domain, publicKey, privateKey
-    // this.ipfs.addDomain("newDomanToadd", "pubkey", "privkey");
-    // this.ipfs.addDomain("asfsa", "pubkey", "privkey");
-    this.ipfs.getAddress("asfsa");
+    
   }
 
   render() {

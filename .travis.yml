@@ -6,6 +6,7 @@ cache: npm
 
 before_install:
   - cd extension
+  - mv config.example.js config.js
 
 install:
   - npm install

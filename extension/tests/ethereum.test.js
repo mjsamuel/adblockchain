@@ -1,4 +1,5 @@
-const eth = require('../app/ethereum.js');
+import { Ethereum } from '../app/services/ethereum.js'
+const eth = new Ethereum()
 
 describe('ethereum.js', () => {
 
