@@ -59,6 +59,9 @@ const config = {
         use: ["file-loader"]
       }
     ]
+  },
+  node: {
+    fs: 'empty'
   }
 };
 
