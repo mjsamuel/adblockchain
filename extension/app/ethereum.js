@@ -24,8 +24,8 @@ export function transferFunds(userAddress, creatorAddress, amount) {
 
   // Sending the funds
   web3.eth.sendTransaction({
-      to: userAddress,
-      from: creatorAddress,
+      to: creatorAddress,
+      from: userAddress,
       value: amount
     }).then(transactionDetails => {
       console.log(transactionDetails)
@@ -35,9 +35,9 @@ export function transferFunds(userAddress, creatorAddress, amount) {
 }
 
 /**
- * Gets an ammount of ETH in wei
+ * Gets an amount of ETH in wei
  * @param {Int} amount - The amount of ETH to be returned
- * @return {Int} - An ammount of ETH in wei
+ * @return {Int} - An amount of ETH in wei
  */
 export function getEth(amount) {
   let eth = amount * Math.pow(10, 18);
@@ -55,4 +55,9 @@ export function listAccounts() {
     }).catch(error => {
       console.log(error)
     });
+}
+
+export async function getBalance(walletAddress) {
+  const balance = await web3.eth.getBalance(walletAddress);
+  console.log(balance)
 }
