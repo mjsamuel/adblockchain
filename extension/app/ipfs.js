@@ -9,7 +9,6 @@ const decoder = new TextDecoder('utf-8');
  * Gets the Ethereum public key from our IPFS database
  * @param {String} domainName - The domain that you want the public key of  
  * @return {String} - The corresponding public key if successful or undefined
- * 
  */
 export async function getPublicKey(domainName) {
     // Retrieve the entire database as a string
@@ -44,6 +43,9 @@ export async function getDatabse() {
 
 /**
  * Adds a new domain to the IPFS database
+ * @param {String} domainName - the URL of the domain you want to add
+ * @param {String} publicKey - the Ethereum public key for that domain
+ * @param {String} privateKey - the Ethereum private key for that domain
  */
 export async function addDomain(domainName, publicKey, privateKey) {
     // Retrieve the entire database as a string
@@ -61,11 +63,17 @@ export async function addDomain(domainName, publicKey, privateKey) {
 
 /**
  * Updates the cost per page view for a specific domain
+ * @param {String} domainName - the URL of the domain you want to update
+ * @param {Int} cost - the updated cost-per-view for that domain
  */
 export async function updateCost(domainName, cost) {
 
 }
 
+/**
+ * Updates the IPFS pointer to our newly updated database
+ * @param {String} databaseString - the updated database as a string
+ */
 export async function updateDatabase(databaseString) {
     // Wait for the data to be added to IPFS and store the returned hash address
     const newIpfsAddress = await ipfs.add(databaseString)

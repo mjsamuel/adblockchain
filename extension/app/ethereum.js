@@ -27,11 +27,7 @@ export function transferFunds(userAddress, creatorAddress, amount) {
       to: creatorAddress,
       from: userAddress,
       value: amount
-    }).then(transactionDetails => {
-      console.log(transactionDetails)
-    }).catch(error => {
-      console.log(error)
-    });
+    })
 }
 
 /**
@@ -48,15 +44,15 @@ export function getEth(amount) {
  * Debug function that prints the public address of all accounts in the 
  * Ganache blockchain
  */
-export function listAccounts() {
-  web3.eth.getAccounts()
-    .then(fetchedAccounts=> {
-      console.log(fetchedAccounts);
-    }).catch(error => {
-      console.log(error)
-    });
+export async function listAccounts() {
+  const fetchedAccounts = await web3.eth.getAccounts()
+  console.log(fetchedAccounts)
 }
 
+/**
+ * Debug function to print the balance of a particular account 
+ * @param {String} walletAddress - the wallet that you want to get the balance of
+ */
 export async function getBalance(walletAddress) {
   const balance = await web3.eth.getBalance(walletAddress);
   console.log(balance)
