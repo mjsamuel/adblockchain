@@ -131,3 +131,7 @@ Temporary Items
 
 # Truffle
 build/
+
+# Data
+extension/data/records.csv
+extension/config.js

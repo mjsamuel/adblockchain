@@ -6,17 +6,18 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
-    "ipfs": "^0.48.1",
+    "fs": "0.0.1-security",
+    "ipfs-http-client": "^46.1.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1",
-    "web3": "^1.2.11"
+    "react-scripts": "^3.4.3",
+    "web3": "^1.2.11",
+    "webpack-extension-manifest-plugin": "^0.5.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "./script/build.sh",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "NODE_ENV=development webpack --mode development --config webpack.js --watch",
+    "build": "NODE_ENV=development webpack --mode development --config webpack.js",
+    "test": "jest ./tests"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -32,5 +33,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^6.0.3",
+    "jest": "^26.4.2",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
   }
 }
