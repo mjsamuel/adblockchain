@@ -1,0 +1,66 @@
+const Web3 = require('web3');
+import { DEFAULT_ETH_ACCOUNT } from '../../config.js';
+
+export class Ethereum {
+  constructor() {
+    // Creating connection to our Ganache personal blockchain
+    this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+  }
+
+  /**
+   * Generates an Ethereum account  
+   * @return {Object} - the account object containing their public and private key
+   */
+  createAccount() {
+    let account = this.web3.eth.accounts.create();
+    return account;
+  }
+
+  /**
+   * Transfers funds from one user account to another
+   * @param {String} userAddress - The address that funds will be withdrawn from
+   * @param {String} creatorAddress - The address that funds will be deposited into
+   * @param {Number} amount - the amount of money to be transferred in ETH
+   */
+  transferFunds(creatorAddress, amount) {
+    // Converting from ETH to wei
+    amount = this.getEth(amount);
+
+    // Sending the funds
+    // NOTE: Using a hard coded account to transfer funds from for now since we 
+    // haven't implemented  login functionality yet
+    this.web3.eth.sendTransaction({
+        from: DEFAULT_ETH_ACCOUNT,
+        to: creatorAddress,
+        value: amount
+      });
+  }
+
+  /**
+   * Gets an amount of ETH in wei
+   * @param {Int} amount - The amount of ETH to be returned
+   * @return {Int} - An amount of ETH in wei
+   */
+  getEth(amount) {
+    let eth = amount * Math.pow(10, 18);
+    return eth;
+  }
+
+  /**
+   * Debug function that prints the public address of all accounts in the 
+   * Ganache blockchain
+   */
+  async listAccounts() {
+    const fetchedAccounts = await web3.eth.getAccounts();
+    console.log(fetchedAccounts);
+  }
+
+  /**
+   * Debug function to print the balance of a particular account 
+   * @param {String} walletAddress - the wallet that you want to get the balance of
+   */
+  async getBalance(walletAddress) {
+    const balance = await this.web3.eth.getBalance(walletAddress);
+    console.log(balance / Math.pow(10, 18));
+  }
+}

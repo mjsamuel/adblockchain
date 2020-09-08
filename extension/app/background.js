@@ -1,5 +1,17 @@
-const eth = require('./ethereum.js');
-const ipfs = require('./ipfs.js')
+// const eth = require('./services/ethereum.js');
+// const ipfs = require('./services/ipfs.js');
+
+import { Ethereum } from './services/ethereum.js'
+var eth 
+import { IPFS } from './services/ipfs.js'
+var ipfs 
+
+setup()
+
+function setup() {
+  eth = new Ethereum()
+  ipfs = new IPFS() 
+}
 
 /**
  * Listens for whenever a tab changes
@@ -7,27 +19,37 @@ const ipfs = require('./ipfs.js')
 chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
   const url = changeInfo["url"]
   const filteredUrl = filterUrl(url)
+  // Checking if a valid URL 
   if (filteredUrl != undefined) {
-    var domainData = await ipfs.getPublicKey(filteredUrl)
-
-    if (domainData == undefined) {
-      // Domain is not in database so generating a new public and private key
-      const ethAccount = eth.createAccount()
-      await ipfs.addDomain(filteredUrl, ethAccount.address, ethAccount.privateKey)
-      domainData = {
-        "publicKey": ethAccount.address,
-        "cpv": 0.25
-      }
-    } 
-
-    // Using a hard coded account to transfer funds from for now since we haven't 
-    // got login functionality set up yet
-    eth.transferFunds(
-      "0x561D1D62083eBE58FFdcCBD283791f98d19a0AF0",
-      domainData.publicKey,
-      domainData.cpv)
+    transferFunds(filteredUrl)
   }
 });
+
+/**
+ * Retrieves the wallet address for a particular domain and sends funds to that
+ * address if it is in that database. If not, a public and private key are
+ * generated, added to the database and then funds are transferred  
+ * @param {String} url - the domain that you want to send money to
+ */
+async function transferFunds(url) {
+  var domainData = await ipfs.getDomainData(url)
+
+  if (domainData == undefined) {
+    console.log(`${url} not in database\nGenerating public and private key...`)
+    // Domain is not in database so generating a new public and private key
+    const ethAccount = eth.createAccount()
+    domainData = await ipfs.addDomain(url, ethAccount.address, ethAccount.privateKey)
+  } 
+
+  // Sending fund to the corresponding address for this domain
+  eth.transferFunds(
+    domainData.publicKey,
+    domainData.cpv)
+
+  console.log(`Domain: ${url}\n` +
+    `Ethereum address: ${domainData.publicKey}\n` + 
+    `Ammount transferred: ${domainData.cpv} ETH \n`)
+}
 
 /**
  * Checks whether a string is a valid URL and trims extra information
@@ -41,7 +63,7 @@ function filterUrl(url) {
     /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b/;
 
   if (url != undefined) {
-    temp = (url.match(urlRegExp) || []).join('')
+    var temp = (url.match(urlRegExp) || []).join('')
     if (temp != '') filteredUrl = temp;
   }
 
