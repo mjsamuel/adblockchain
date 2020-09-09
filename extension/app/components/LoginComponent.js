@@ -21,18 +21,25 @@ class LoginComponent extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   }
 
+  componentDidMount() {
+    chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
+      if (result['publicKey'] !== undefined &&
+          result['publicKey'] !== '' &&
+          result['privateKey'] !== undefined &&
+          result['privateKey'] !== '') {
+        console.log("isLoggedIn: Logged in");
+        this.props.history.push(`/dashboard`)
+      }
+    });
+  }
+
   async submitClicked() {
     const data = {
       'publicKey': this.state.publicKey,
       'privateKey': this.state.privateKey
     }
-
     await chrome.storage.sync.set(data);
-
-    // chrome.storage.sync.get(['publicKey', 'privateKey'], function(result) {
-    //   console.log(`Public key: ${result['publicKey']}\n` +
-    //     `Private key: ${result['privateKey']}`);
-    // });
+    this.props.history.push(`/dashboard`)
   }
 
   registerClicked() {
@@ -65,16 +72,22 @@ class LoginComponent extends React.Component {
             <button 
               type="button" 
               className="btn btn-primary"
-              onClick={this.submitClicked}>Submit</button>
+              onClick={this.submitClicked}>
+                Submit
+            </button>
             <button 
               type="button" 
               className="btn btn-success"
-              onClick={this.registerClicked}>Register</button>
+              onClick={this.registerClicked}>
+                Register
+            </button>
           </div>
         </form>
       </>
     );
   }
 }
+
+
 
 export default LoginComponent

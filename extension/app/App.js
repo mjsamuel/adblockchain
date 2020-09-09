@@ -1,7 +1,10 @@
 import React from 'react'
-import { Router, Route } from 'react-router-dom'
+import { Router, Route, Switch } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
+
 import LoginComponent from './components/LoginComponent.js'
+import DashboardComponent from './components/DashboardComponent.js'
+
 import './css/App.css'
 
 class App extends React.Component {
@@ -12,7 +15,11 @@ class App extends React.Component {
     return (
       <div className="App">
         <Router history={history}>
-           <Route exact path='/' component={LoginComponent} />
+           <Switch>
+             <Route exact path='/' component={LoginComponent} />
+             <Route path='/login' component={LoginComponent} />
+             <Route path='/dashboard' component={DashboardComponent} />
+           </Switch>
         </Router>
       </div>
     );
