@@ -12,7 +12,8 @@
         "default_title": "Blockchain Adblock"
     },
     "permissions": [
-        "tabs"
+        "tabs",
+        "storage"
     ],
     "background": {
         "scripts": ["background.js"]

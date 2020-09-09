@@ -13,16 +13,29 @@ class LoginComponent extends React.Component {
     }
 
     this.handleChange = this.handleChange.bind(this)
-    this.loginClicked = this.loginClicked.bind(this)
+    this.submitClicked = this.submitClicked.bind(this)
+    this.registerClicked = this.registerClicked.bind(this)
   }
 
   handleChange(event) {
     this.setState({ [event.target.name]: event.target.value });
   }
 
-  loginClicked() {
-    console.log(this.state.publicKey)
-    console.log(this.state.privateKey)
+  async submitClicked() {
+    const data = {
+      'publicKey': this.state.publicKey,
+      'privateKey': this.state.privateKey
+    }
+
+    await chrome.storage.sync.set(data);
+
+    // chrome.storage.sync.get(['publicKey', 'privateKey'], function(result) {
+    //   console.log(`Public key: ${result['publicKey']}\n` +
+    //     `Private key: ${result['privateKey']}`);
+    // });
+  }
+
+  registerClicked() {
   }
 
   render() {
@@ -48,15 +61,15 @@ class LoginComponent extends React.Component {
               value={this.state.privateKey} 
               onChange={this.handleChange} />
           </div>
-          <div class="btn-group fill">
+          <div className="btn-group fill">
             <button 
               type="button" 
-              class="btn btn-primary" 
-              >Submit</button>
+              className="btn btn-primary"
+              onClick={this.submitClicked}>Submit</button>
             <button 
               type="button" 
-              class="btn btn-success" 
-              >Register</button>
+              className="btn btn-success"
+              onClick={this.registerClicked}>Register</button>
           </div>
         </form>
       </>
