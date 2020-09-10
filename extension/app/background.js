@@ -34,8 +34,20 @@ async function transferFunds(url) {
       `Generated Private key: ${ethAccount.privateKey}`)
   } 
 
-  // Sending funds to the corresponding address for this domain
-  eth.transferFunds(url, domainData.publicKey, domainData.cpv)
+  // Retrieving the user's public and private key from Chrome storage
+  chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
+    const publicKey = result['publicKey']
+    const privateKey = result['privateKey']
+    if (publicKey !== undefined &&
+        publicKey !== '' &&
+        privateKey !== undefined &&
+        privateKey !== '') {
+      eth.transferFunds(publicKey, domainData.publicKey, domainData.cpv)
+      console.log(`Transferred funds to ${url}\n` +
+        `Ethereum address: ${domainData.publicKey}\n` + 
+        `Ammount transferred: ${domainData.cpv} ETH \n`)
+    }
+  });
 }
 
 /**

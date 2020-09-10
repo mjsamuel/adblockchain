@@ -18,7 +18,7 @@
   "scripts": {
     "start": "NODE_ENV=development webpack --mode development --config webpack.js --watch",
     "build": "NODE_ENV=development webpack --mode development --config webpack.js",
-    "test": "jest ./tests",
+    "test": "jest ./tests -u",
     "clean": "rm -r ./build"
   },
   "eslintConfig": {
@@ -37,9 +37,24 @@
     ]
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.11.5",
+    "@babel/preset-react": "^7.10.4",
+    "babel-jest": "^26.3.0",
     "copy-webpack-plugin": "^6.0.3",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.4",
+    "enzyme-to-json": "^3.5.0",
     "jest": "^26.4.2",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "\\.(css|jpg|png)$": "<rootDir>/tests/__mocks__/empty-module.js"
+    },
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "setupFiles": ["./tests/setupTests.js"]
   }
 }

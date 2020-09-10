@@ -35,7 +35,7 @@ class LoginComponent extends React.Component {
     const publicKey = this.state.publicKey.trim()
     const privateKey = this.state.privateKey.trim()
 
-    const errors = await this.validateCredentials(publicKey, privateKey)
+    const errors = await this.eth.validateCredentials(publicKey, privateKey)
     if (errors.length === 0)  {
       // Valid login credentials so data is saved in Chrome local storage
       const data = {
@@ -48,42 +48,6 @@ class LoginComponent extends React.Component {
     } else {
       this.setState({ errors: errors });
     } 
-  }
-
-  /**
-   * Checks the validity of both a public and private key and whether they 
-   * correspond to one another
-   * @param {String} publicKey - the public key to be validated 
-   * @param {String} privateKey - the private key to be validated 
-   */
-  async validateCredentials(publicKey, privateKey) {
-    var errors = []
-
-    // Checking if public key is valid
-    if (publicKey === '') {
-      errors.push('Public key field is empty');
-    } else if (!eth.web3.utils.isAddress(publicKey)) {
-      errors.push('Public key is invalid');
-    }
-
-    // Checking if private key is valid
-    if (privateKey === '') {
-      errors.push('Private key is empty');
-    } else {
-      try {
-        // Retrieving a public key from the passed in private key and checking
-        // if that matches the passed in public key
-        const extractedKey = 
-          this.eth.web3.eth.accounts.privateKeyToAccount(privateKey).address
-        if (extractedKey !== publicKey) {
-          errors.push('Private key does not correspond to public key')
-        }
-      } catch (error) {
-        errors.push('Private key is invalid');
-      }
-    }
-
-    return errors
   }
 
   registerClicked() {

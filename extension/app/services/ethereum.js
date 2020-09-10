@@ -17,34 +17,55 @@ export class Ethereum {
 
   /**
    * Transfers funds from one user account to another
-   * @param {String} url - the corresponding domain to the creatorAddress
    * @param {String} creatorAddress - the address that funds will be deposited into
    * @param {Number} amount - the amount of money to be transferred in ETH
    */
-  async transferFunds(url, creatorAddress, amount) {
+  async transferFunds(userAddress, creatorAddress, amount) {
     // Converting from ETH to wei
     const weiAmount = this.getEth(amount);
 
-    // Retrieving the user's public and private key from Chrome storage
-    chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
-      const publicKey = result['publicKey']
-      const privateKey = result['privateKey']
+    // Transferring the funds
+    this.web3.eth.sendTransaction({
+      from: userAddress,
+      to: creatorAddress,
+      value: weiAmount
+    }); 
+  }
 
-      if (publicKey !== undefined &&
-          publicKey !== '' &&
-          privateKey !== undefined &&
-          privateKey !== '') {
-        // Transferring the funds
-        this.web3.eth.sendTransaction({
-          from: publicKey,
-          to: creatorAddress,
-          value: weiAmount
-        }); 
-        console.log(`Transferred funds to ${url}\n` +
-          `Ethereum address: ${creatorAddress}\n` + 
-          `Ammount transferred: ${amount} ETH \n`)
+  /**
+   * Checks the validity of both a public and private key and whether they 
+   * correspond to one another
+   * @param {String} publicKey - the public key to be validated 
+   * @param {String} privateKey - the private key to be validated 
+   */
+  async validateCredentials(publicKey, privateKey) {
+    var errors = []
+
+    // Checking if public key is valid
+    if (publicKey === '') {
+      errors.push('Public key is empty');
+    } else if (!this.web3.utils.isAddress(publicKey)) {
+      errors.push('Public key is invalid');
+    }
+
+    // Checking if private key is valid
+    if (privateKey === '') {
+      errors.push('Private key is empty');
+    } else {
+      try {
+        // Retrieving a public key from the passed in private key and checking
+        // if that matches the passed in public key
+        const extractedKey = 
+          this.web3.eth.accounts.privateKeyToAccount(privateKey).address
+        if (extractedKey !== publicKey) {
+          errors.push('Private key does not correspond to public key')
+        }
+      } catch (error) {
+        errors.push('Private key is invalid');
       }
-    });
+    }
+
+    return errors
   }
 
   /**
@@ -63,6 +84,7 @@ export class Ethereum {
    */
   async listAccounts() {
     const fetchedAccounts = await this.web3.eth.getAccounts();
+    return fetchedAccounts;
   }
 
   /**
@@ -71,5 +93,6 @@ export class Ethereum {
    */
   async getBalance(walletAddress) {
     const balance = await this.web3.eth.getBalance(walletAddress);
+    return balance /  Math.pow(10, 18);
   }
 }
