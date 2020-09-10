@@ -51,7 +51,7 @@ export class Ethereum {
    * Ganache blockchain
    */
   async listAccounts() {
-    const fetchedAccounts = await web3.eth.getAccounts();
+    const fetchedAccounts = await this.web3.eth.getAccounts();
     console.log(fetchedAccounts);
   }
 

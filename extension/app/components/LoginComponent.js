@@ -1,5 +1,7 @@
 import React from 'react'
 import '../css/LoginComponent.css'
+import { Ethereum } from '../services/ethereum.js'
+
 
 class LoginComponent extends React.Component {
   constructor(props) {
@@ -8,9 +10,10 @@ class LoginComponent extends React.Component {
     this.state = {
       publicKey: '',
       privateKey: '',
-      loginFailed: false,
       errors: []
     }
+
+    this.eth = new Ethereum()
 
     this.handleChange = this.handleChange.bind(this)
     this.submitClicked = this.submitClicked.bind(this)
@@ -21,11 +24,11 @@ class LoginComponent extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   }
 
-  submitClicked() {
+  async submitClicked() {
     const publicKey = this.state.publicKey.trim()
     const privateKey = this.state.privateKey.trim()
 
-    const errors = this.validateCredentials(publicKey, privateKey)
+    const errors = await this.validateCredentials(publicKey, privateKey)
     if (errors.length === 0)  {
       // Valid login credentials so data is saved in Chrome local storage
       const data = {
@@ -35,26 +38,36 @@ class LoginComponent extends React.Component {
       chrome.storage.sync.set(data);
       this.props.history.push(`/`);
     } else {
-      this.setState({
-        errors: errors,
-        loginFailed: true
-      });
+      this.setState({ errors: errors });
     } 
   }
 
-  validateCredentials(publicKey, privateKey) {
-    const pubKeyRegEx = /0x[a-fA-F0-9]{40}\b/
+  async validateCredentials(publicKey, privateKey) {
     var errors = []
 
+    // Checking if public key is valid
     if (publicKey === '') {
       errors.push('Public key field is empty');
-    } else if (!pubKeyRegEx.test(publicKey)) {
-      errors.push('Public key is not valid');
-    } 
+    } else if (!eth.web3.utils.isAddress(publicKey)) {
+      errors.push('Public key is invalid');
+    }
 
+    // Checking if private key is valid
     if (privateKey === '') {
       errors.push('Private key is empty');
-    } 
+    } else {
+      try {
+        // Retrieving a public key from the passed in private key and checking
+        // if that matches the passed in public key
+        const extractedKey = 
+          this.eth.web3.eth.accounts.privateKeyToAccount(privateKey).address
+        if (extractedKey !== publicKey) {
+          errors.push('Private key does not correspond to public key')
+        }
+      } catch (error) {
+        errors.push('Private key is invalid');
+      }
+    }
 
     return errors
   }
