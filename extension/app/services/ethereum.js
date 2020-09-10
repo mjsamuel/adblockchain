@@ -1,5 +1,4 @@
 const Web3 = require('web3');
-import { DEFAULT_ETH_ACCOUNT } from '../../config.js';
 
 export class Ethereum {
   constructor() {
@@ -18,22 +17,34 @@ export class Ethereum {
 
   /**
    * Transfers funds from one user account to another
-   * @param {String} userAddress - The address that funds will be withdrawn from
-   * @param {String} creatorAddress - The address that funds will be deposited into
+   * @param {String} url - the corresponding domain to the creatorAddress
+   * @param {String} creatorAddress - the address that funds will be deposited into
    * @param {Number} amount - the amount of money to be transferred in ETH
    */
-  transferFunds(creatorAddress, amount) {
+  async transferFunds(url, creatorAddress, amount) {
     // Converting from ETH to wei
-    amount = this.getEth(amount);
+    const weiAmount = this.getEth(amount);
 
-    // Sending the funds
-    // NOTE: Using a hard coded account to transfer funds from for now since we 
-    // haven't implemented  login functionality yet
-    this.web3.eth.sendTransaction({
-        from: DEFAULT_ETH_ACCOUNT,
-        to: creatorAddress,
-        value: amount
-      });
+    // Retrieving the user's public and private key from Chrome storage
+    chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
+      const publicKey = result['publicKey']
+      const privateKey = result['privateKey']
+
+      if (publicKey !== undefined &&
+          publicKey !== '' &&
+          privateKey !== undefined &&
+          privateKey !== '') {
+        // Transferring the funds
+        this.web3.eth.sendTransaction({
+          from: publicKey,
+          to: creatorAddress,
+          value: weiAmount
+        }); 
+        console.log(`Transferred funds to ${url}\n` +
+          `Ethereum address: ${creatorAddress}\n` + 
+          `Ammount transferred: ${amount} ETH \n`)
+      }
+    });
   }
 
   /**
