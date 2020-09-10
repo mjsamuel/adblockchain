@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, Redirect } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 import { withRouter } from "react-router";
 
 class AuthenticatedRoute extends React.Component {
@@ -26,7 +26,7 @@ class AuthenticatedRoute extends React.Component {
 
   render() {
     const { component: Component, ...rest } = this.props;
-    if(this.state.isLoggedIn === null) return <div>Loading ...</div>
+    if(this.state.isLoggedIn === null) return <div>Loading...</div>
     return <Route {...this.props} />
   }
 }

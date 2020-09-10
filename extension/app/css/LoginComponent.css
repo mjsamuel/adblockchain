@@ -1,11 +1,16 @@
-.btn-group {
-  width: 100%;
-}
-
 .btn-group.fill {
   display: flex;
 }
 
 .fill .btn {
   flex: 1
+}
+
+.alert {
+  font-size: 14px;
+}
+
+ul {
+  margin: 0;
+  padding-left: 20px;
 }

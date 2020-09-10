@@ -22,9 +22,28 @@ class LoginComponent extends React.Component {
   }
 
   submitClicked() {
-    const pubKeyRegEx = /0x[a-fA-F0-9]{40}\b/
     const publicKey = this.state.publicKey.trim()
     const privateKey = this.state.privateKey.trim()
+
+    const errors = this.validateCredentials(publicKey, privateKey)
+    if (errors.length === 0)  {
+      // Valid login credentials so data is saved in Chrome local storage
+      const data = {
+        'publicKey': this.state.publicKey,
+        'privateKey': this.state.privateKey
+      }
+      chrome.storage.sync.set(data);
+      this.props.history.push(`/`);
+    } else {
+      this.setState({
+        errors: errors,
+        loginFailed: true
+      });
+    } 
+  }
+
+  validateCredentials(publicKey, privateKey) {
+    const pubKeyRegEx = /0x[a-fA-F0-9]{40}\b/
     var errors = []
 
     if (publicKey === '') {
@@ -37,17 +56,7 @@ class LoginComponent extends React.Component {
       errors.push('Private key is empty');
     } 
 
-    if (errors.length === 0)  {
-      const data = {
-        'publicKey': this.state.publicKey,
-        'privateKey': this.state.privateKey
-      }
-      chrome.storage.sync.set(data);
-      this.props.history.push(`/`);
-    } else {
-      this.setState({ errors: errors });
-      console.log(errors)
-    }
+    return errors
   }
 
   registerClicked() {
@@ -57,6 +66,15 @@ class LoginComponent extends React.Component {
     return (
       <>
         <h2>Login</h2>
+        {this.state.errors.length !== 0 && (
+          <div className="alert alert-danger" role="alert">
+            <b>Error/s</b>:
+            <ul>
+              {this.state.errors.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          </div>)}
         <form>
           <div className="form-group">
             <input 
