@@ -2,7 +2,6 @@ import React from 'react'
 import '../css/LoginComponent.css'
 import { Ethereum } from '../services/ethereum.js'
 
-
 class LoginComponent extends React.Component {
   constructor(props) {
     super(props)
@@ -20,10 +19,18 @@ class LoginComponent extends React.Component {
     this.registerClicked = this.registerClicked.bind(this)
   }
 
+  /**
+   * Updates the state of the component when an 'onChange' event occurs
+   * @param {Object} event - the event object generated
+   */
   handleChange(event) {
     this.setState({ [event.target.name]: event.target.value });
   }
 
+  /**
+   * Stores the Ethereum credentials within Chrome storage is they are found to
+   * be valid and redirects the user
+   */
   async submitClicked() {
     const publicKey = this.state.publicKey.trim()
     const privateKey = this.state.privateKey.trim()
@@ -36,12 +43,19 @@ class LoginComponent extends React.Component {
         'privateKey': this.state.privateKey
       }
       chrome.storage.sync.set(data);
+      // Sending user to their dashboard
       this.props.history.push(`/`);
     } else {
       this.setState({ errors: errors });
     } 
   }
 
+  /**
+   * Checks the validity of both a public and private key and whether they 
+   * correspond to one another
+   * @param {String} publicKey - the public key to be validated 
+   * @param {String} privateKey - the private key to be validated 
+   */
   async validateCredentials(publicKey, privateKey) {
     var errors = []
 

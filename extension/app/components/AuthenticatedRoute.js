@@ -11,6 +11,10 @@ class AuthenticatedRoute extends React.Component {
     }
   }
 
+  /**
+   * Checks Chrome local storage if the public and private key are set, if not
+   * the user is redirected to the login page
+   */
   componentDidMount() {
     chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
       if (result['publicKey'] !== undefined &&
@@ -24,6 +28,10 @@ class AuthenticatedRoute extends React.Component {
     });
   }
 
+  /**
+   * Renders a loading page while waiting for a response from `componentDidMount`.
+   * If logged in the user is directed to the correct page
+   */
   render() {
     const { component: Component, ...rest } = this.props;
     if(this.state.isLoggedIn === null) return <div>Loading...</div>

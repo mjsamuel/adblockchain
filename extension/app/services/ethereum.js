@@ -63,7 +63,6 @@ export class Ethereum {
    */
   async listAccounts() {
     const fetchedAccounts = await this.web3.eth.getAccounts();
-    console.log(fetchedAccounts);
   }
 
   /**
@@ -72,6 +71,5 @@ export class Ethereum {
    */
   async getBalance(walletAddress) {
     const balance = await this.web3.eth.getBalance(walletAddress);
-    console.log(balance / Math.pow(10, 18));
   }
 }
