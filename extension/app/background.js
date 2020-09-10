@@ -10,7 +10,7 @@ chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
   const url = changeInfo["url"]
   const filteredUrl = filterUrl(url)
   // Checking if a valid URL 
-  if (filteredUrl != undefined) {
+  if (filteredUrl !== undefined) {
     transferFunds(filteredUrl)
   }
 });
@@ -24,21 +24,30 @@ chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
 async function transferFunds(url) {
   var domainData = await ipfs.getDomainData(url)
 
-  if (domainData == undefined) {
-    console.log(`${url} not in database\nGenerating public and private key...`)
+  if (domainData === undefined) {
     // Domain is not in database so generating a new public and private key
     const ethAccount = eth.createAccount()
     domainData = await ipfs.addDomain(url, ethAccount.address, ethAccount.privateKey)
+
+    console.log(`${url} not in database\n` +
+      `Generated Public key: ${ethAccount.address}\n` +
+      `Generated Private key: ${ethAccount.privateKey}`)
   } 
 
-  // Sending fund to the corresponding address for this domain
-  eth.transferFunds(
-    domainData.publicKey,
-    domainData.cpv)
-
-  console.log(`Domain: ${url}\n` +
-    `Ethereum address: ${domainData.publicKey}\n` + 
-    `Ammount transferred: ${domainData.cpv} ETH \n`)
+  // Retrieving the user's public and private key from Chrome storage
+  chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
+    const publicKey = result['publicKey']
+    const privateKey = result['privateKey']
+    if (publicKey !== undefined &&
+        publicKey !== '' &&
+        privateKey !== undefined &&
+        privateKey !== '') {
+      eth.transferFunds(publicKey, domainData.publicKey, domainData.cpv)
+      console.log(`Transferred funds to ${url}\n` +
+        `Ethereum address: ${domainData.publicKey}\n` + 
+        `Ammount transferred: ${domainData.cpv} ETH \n`)
+    }
+  });
 }
 
 /**
@@ -52,9 +61,9 @@ function filterUrl(url) {
   const urlRegExp = 
     /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b/;
 
-  if (url != undefined) {
+  if (url !== undefined) {
     var temp = (url.match(urlRegExp) || []).join('')
-    if (temp != '') filteredUrl = temp;
+    if (temp !== '') filteredUrl = temp;
   }
 
   return filteredUrl;
