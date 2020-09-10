@@ -2,6 +2,7 @@ import React from 'react'
 import { Router, Route, Switch } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 
+import AuthenticatedRoute from './components/AuthenticatedRoute.js'
 import LoginComponent from './components/LoginComponent.js'
 import DashboardComponent from './components/DashboardComponent.js'
 
@@ -16,9 +17,8 @@ class App extends React.Component {
       <div className="App">
         <Router history={history}>
            <Switch>
-             <Route exact path='/' component={LoginComponent} />
+             <AuthenticatedRoute exact path='/' component={DashboardComponent} />
              <Route path='/login' component={LoginComponent} />
-             <Route path='/dashboard' component={DashboardComponent} />
            </Switch>
         </Router>
       </div>

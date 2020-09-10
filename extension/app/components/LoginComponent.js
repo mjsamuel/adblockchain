@@ -9,7 +9,7 @@ class LoginComponent extends React.Component {
       publicKey: '',
       privateKey: '',
       loginFailed: false,
-      errorText: ''
+      errors: []
     }
 
     this.handleChange = this.handleChange.bind(this)
@@ -21,25 +21,33 @@ class LoginComponent extends React.Component {
     this.setState({ [event.target.name]: event.target.value });
   }
 
-  componentDidMount() {
-    chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
-      if (result['publicKey'] !== undefined &&
-          result['publicKey'] !== '' &&
-          result['privateKey'] !== undefined &&
-          result['privateKey'] !== '') {
-        console.log("isLoggedIn: Logged in");
-        this.props.history.push(`/dashboard`)
-      }
-    });
-  }
+  submitClicked() {
+    const pubKeyRegEx = /0x[a-fA-F0-9]{40}\b/
+    const publicKey = this.state.publicKey.trim()
+    const privateKey = this.state.privateKey.trim()
+    var errors = []
 
-  async submitClicked() {
-    const data = {
-      'publicKey': this.state.publicKey,
-      'privateKey': this.state.privateKey
+    if (publicKey === '') {
+      errors.push('Public key field is empty');
+    } else if (!pubKeyRegEx.test(publicKey)) {
+      errors.push('Public key is not valid');
+    } 
+
+    if (privateKey === '') {
+      errors.push('Private key is empty');
+    } 
+
+    if (errors.length === 0)  {
+      const data = {
+        'publicKey': this.state.publicKey,
+        'privateKey': this.state.privateKey
+      }
+      chrome.storage.sync.set(data);
+      this.props.history.push(`/`);
+    } else {
+      this.setState({ errors: errors });
+      console.log(errors)
     }
-    await chrome.storage.sync.set(data);
-    this.props.history.push(`/dashboard`)
   }
 
   registerClicked() {
@@ -87,7 +95,5 @@ class LoginComponent extends React.Component {
     );
   }
 }
-
-
 
 export default LoginComponent
