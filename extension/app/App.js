@@ -7,8 +7,17 @@ import LoginComponent from './components/LoginComponent.js'
 import DashboardComponent from './components/DashboardComponent.js'
 
 import './css/App.css'
+import { IPFS } from './services/ipfs.js'
+const ipfs = new IPFS();
 
 class App extends React.Component {
+
+  async componentDidMount(){
+    await ipfs.clearDatabase();
+    const data = await ipfs.getDatabse();
+    console.log(data);
+    console.log(Object.keys(data).length)
+  }
 
   render() {
     const history = createMemoryHistory()
