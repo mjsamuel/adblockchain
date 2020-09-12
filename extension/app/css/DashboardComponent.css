@@ -1,1 +1,14 @@
+.pagination {
+  display: flex;
+  text-align: center;
+  margin: 10px 0;
+}
 
+.page-item {
+  flex: 1
+}
+
+/*.table tr:first-child {
+  border-top: none;
+}
+*/
