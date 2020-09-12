@@ -17,6 +17,7 @@ export class Ethereum {
 
   /**
    * Transfers funds from one user account to another
+   * @param {String} userAddress - the address that funds will be taken from
    * @param {String} creatorAddress - the address that funds will be deposited into
    * @param {Number} amount - the amount of money to be transferred in ETH
    */
