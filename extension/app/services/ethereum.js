@@ -3,7 +3,7 @@ const Web3 = require('web3');
 export class Ethereum {
   constructor() {
     // Creating connection to our Ganache personal blockchain
-    this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+    this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
   }
 
   /**

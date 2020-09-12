@@ -1,15 +1,22 @@
 import React from 'react'
+import moment from 'moment';
+import '../css/DashboardComponent.css'
 
 class DashboardComponent extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {}
+    this.state = {
+      paidDomains: []
+    }
 
     this.logoutClicked = this.logoutClicked.bind(this);
   }
 
   componentDidMount() {
-    
+    chrome.storage.local.get({'paidDomains': []},  result => {
+      const data = result.paidDomains.reverse();
+      this.setState({ paidDomains: data });
+    });
   }
 
   async logoutClicked() {
@@ -25,6 +32,21 @@ class DashboardComponent extends React.Component {
     return (
       <>
         <h2>Dashboard</h2>
+        <b>Transaction History</b>
+        {this.state.paidDomains.length !== 0 && (
+          <table className="table">
+            <tbody>
+              {this.state.paidDomains.map((transaction, index) => (
+                <tr key={index}>
+                  <td>
+                    <a href={transaction.domainName}>{transaction.domainName}</a>,<br/>
+                    {transaction.cost} ETH,<br/>
+                    {moment(transaction.time).fromNow()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>)}
         <div className="btn-group fill">
           <button 
             type="button" 
