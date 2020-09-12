@@ -1,14 +1,20 @@
 .pagination {
   display: flex;
   text-align: center;
-  margin: 10px 0;
+  margin: 10px 0 0 0;
 }
 
 .page-item {
   flex: 1
 }
 
-/*.table tr:first-child {
+.table tr:first-child td {
   border-top: none;
 }
-*/
+
+.balance {
+  text-align: center;
+  margin: 20px 0;
+  font-weight: 700;
+  font-size: 36px;
+}

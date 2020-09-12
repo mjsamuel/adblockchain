@@ -31,9 +31,11 @@ class DashboardComponent extends React.Component {
     chrome.storage.sync.get(['publicKey', 'privateKey'], async result => {
       const publicKey = result['publicKey']
       if (publicKey !== undefined && publicKey !== '') {
-        var balance = await this.eth.web3.eth.getBalance(publicKey)
-        balance = this.eth.getEth(balance);
-        this.setState({ balance: balance })
+        try {
+          var balance = await this.eth.web3.eth.getBalance(publicKey)
+          balance = this.eth.getEth(balance);
+          this.setState({ balance: balance });
+        } catch(error) {}
       }
     });
   }
@@ -53,16 +55,12 @@ class DashboardComponent extends React.Component {
   changePage(index) {
     const pageNo = this.state.pageNo + index;
     const pageIndex = pageNo * 10;
-
-    if (pageNo >= 0 && pageIndex <= this.state.paidDomains.length) {
+    if (pageNo >= 0 && pageIndex < this.state.paidDomains.length) {
       const pageData = this.state.paidDomains.slice(pageIndex, pageIndex + 10);
       this.setState({ 
         currentPageData: pageData,
         pageNo: pageNo
       });
-      console.log(`page no: ${pageNo}\n` + 
-        `start index ${pageIndex}\n`+
-        `end index ${pageIndex + 10}`)
     };
   }
 
@@ -79,10 +77,12 @@ class DashboardComponent extends React.Component {
     return (
       <>
         <h2>Dashboard</h2>
-        <b>Balance:</b>
-        {this.state.balance && (<div>{this.state.balance.toFixed(4)} ETH</div>)}
+        <b>Balance:</b><br/>
+        <div className="balance">
+          {this.state.balance && (<>{this.state.balance.toFixed(4)}</>)} ETH<br/>
+        </div>
         <b>Transaction History:</b>
-        {this.state.currentPageData.length !== 0 && (
+        {this.state.paidDomains.length !== 0 && (
           <>
             <nav aria-label="...">
               <ul className="pagination">
