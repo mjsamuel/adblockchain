@@ -2,10 +2,17 @@ import { Ethereum } from '../app/services/ethereum.js'
 const Web3 = require('web3');
 const eth = new Ethereum()
 
-describe('getEth()', () => {
+describe('getWei()', () => {
   it('should converts 4 ETH to wei', () => {
     let expectedValue = 4 * Math.pow(10, 18);
-    expect(eth.getEth(4)).toBe(expectedValue);
+    expect(eth.getWei(4)).toBe(expectedValue);
+  });
+});
+
+describe('getEth()', () => {
+  it('should converts 2*18 wei to 2 ETH', () => {
+    let expectedValue = 2;
+    expect(eth.getEth(expectedValue * Math.pow(10, 18))).toBe(expectedValue);
   });
 });
 
