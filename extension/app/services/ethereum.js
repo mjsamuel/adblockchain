@@ -3,7 +3,7 @@ const Web3 = require('web3');
 export class Ethereum {
   constructor() {
     // Creating connection to our Ganache personal blockchain
-    this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:7545'));
+    this.web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
   }
 
   /**
@@ -17,12 +17,13 @@ export class Ethereum {
 
   /**
    * Transfers funds from one user account to another
+   * @param {String} userAddress - the address that funds will be taken from
    * @param {String} creatorAddress - the address that funds will be deposited into
    * @param {Number} amount - the amount of money to be transferred in ETH
    */
   async transferFunds(userAddress, creatorAddress, amount) {
     // Converting from ETH to wei
-    const weiAmount = this.getEth(amount);
+    const weiAmount = this.getWei(amount);
 
     // Transferring the funds
     this.web3.eth.sendTransaction({
@@ -69,12 +70,22 @@ export class Ethereum {
   }
 
   /**
-   * Gets an amount of ETH in wei
-   * @param {Int} amount - The amount of ETH to be returned
+   * Converts ETH to wei
+   * @param {Int} amount - The amount of ETH to be converted
    * @return {Int} - An amount of ETH in wei
    */
+  getWei(amount) {
+    let wei = amount * Math.pow(10, 18);
+    return wei;
+  }
+
+  /**
+   * Converts wei to ETH
+   * @param {Int} amount - The amount of wei to be converted
+   * @return {Int} - An amount of wei in ETH
+   */
   getEth(amount) {
-    let eth = amount * Math.pow(10, 18);
+    let eth = amount / Math.pow(10, 18);
     return eth;
   }
 
