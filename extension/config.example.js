@@ -1,0 +1,3 @@
+export const IPNS_ADDRESS = '/ipns/QmWt5NiTyRwWWJy8EA12VuPvuvgGn8g3265FRahKTpwo6o';
+export const IPNS_KEY = 'QmWt5NiTyRwWWJy8EA12VuPvuvgGn8g3265FRahKTpwo6o';
+export const DEFAULT_ETH_ACCOUNT = '0x561D1D62083eBE58FFdcCBD283791f98d19a0AF0'
