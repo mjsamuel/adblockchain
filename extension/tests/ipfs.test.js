@@ -1,5 +1,5 @@
-import { IPFS } from '../app/services/ipfs.js'
-const ipfs = new IPFS();
+// import { IPFS } from '../app/services/ipfs.js'
+// // const ipfs = new IPFS();
 
 // describe('getDatabse()', async () => {
 //     beforeEach(() => {
