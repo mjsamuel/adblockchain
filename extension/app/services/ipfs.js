@@ -15,10 +15,20 @@ export class IPFS {
      * @return {Object} - the corresponding domain object
      */
     async getDomainData(domainName) {
-        // Retrieve the entire database as a string
-        const database = await this.getDatabse();
-        const domainData = database[domainName];
-        return domainData;
+        // First attempt to retrieve the domain data from local storage
+        const cachedData = localStorage.getItem(domainName);
+
+        // If successful, return the cached data
+        if(cachedData) {
+            return cachedData;
+        } 
+        // Else search the database for it
+        else {
+            // Retrieve the entire database as a string
+            const database = await this.getDatabse();
+            const domainData = database[domainName];
+            return domainData;
+        }
     }
 
     /**
@@ -53,15 +63,21 @@ export class IPFS {
     async addDomain(domainName, publicKey, privateKey) {
         // Retrieve the entire database as a string
         var database = await this.getDatabse();
+        
         // Add the domain data to the database and stringify
         database[domainName] = {
             "publicKey": publicKey,
             "privateKey": privateKey,
             "cpv": 0.20
         }
-        const databaseString = JSON.stringify(database);
 
+        // Convert to JSON string and push the changes to the database
+        const databaseString = JSON.stringify(database);
         this.updateDatabase(databaseString);
+        
+        // Store entry into local storage
+        localStorage.setItem(domainName, databaseString);
+        
         return database[domainName];
     }
 
@@ -71,7 +87,22 @@ export class IPFS {
      * @param {Int} cost - the updated cost-per-view for that domain
      */
     async updateCost(domainName, cost) {
+        // Retrieve the current data for the given domain
+        const domainData = JSON.parse(await this.getDomainData(domainName));
+        
+        // Update the CPV value locally
+        domainData[domainName].cpv = cost;
+        
+        // Retrieve the latest data and replace the entry with our updated domain data
+        const currentData = await this.getDatabse();
+        currentData[domainName] = domainData;
 
+        // Convert the updated data object into a JSON string before adding the changes to the database
+        const updatedData = JSON.stringify(currentData);
+        this.updateDatabase(updatedData);
+
+        // Store entry into local storage
+        localStorage.setItem(domainName, updatedData);
     }
 
     /**

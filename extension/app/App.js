@@ -13,10 +13,6 @@ const ipfs = new IPFS();
 class App extends React.Component {
 
   async componentDidMount(){
-    await ipfs.clearDatabase();
-    const data = await ipfs.getDatabse();
-    console.log(data);
-    console.log(Object.keys(data).length)
   }
 
   render() {

@@ -9,7 +9,6 @@ describe('getDatabse()', async () => {
     it('should return populated data', () => {
         expect.assertions(1);
         
-
         const returnedData = ipfs.getDatabse();
         expect(Object.keys(returnedData).length).toBe(0);
     });
