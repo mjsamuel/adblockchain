@@ -101,7 +101,7 @@ export class IPFS {
         const updatedData = JSON.stringify(currentData);
         this.updateDatabase(updatedData);
 
-        // Store entry into local storage
+        // Update entry into local storage (or creates it if it no longer exists)
         localStorage.setItem(domainName, updatedData);
     }
 
