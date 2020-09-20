@@ -1,40 +1,34 @@
-import React, { Component } from 'react';
-import logo from './images/logo.svg';
-import './css/App.css';
+import React from 'react'
+import { Router, Route, Switch } from 'react-router-dom'
+import { createMemoryHistory } from 'history'
 
-class App extends Component {
+import AuthenticatedRoute from './components/AuthenticatedRoute.js'
+import LoginComponent from './components/LoginComponent.js'
+import DashboardComponent from './components/DashboardComponent.js'
 
-  constructor(props) {
-    super(props)
-    this.state = {}
-  }
+import './css/App.css'
+import { IPFS } from './services/ipfs.js'
+const ipfs = new IPFS();
 
-  async componentDidMount() {
-    
+class App extends React.Component {
+
+  async componentDidMount(){
   }
 
   render() {
+    const history = createMemoryHistory()
+
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <p> </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <Router history={history}>
+           <Switch>
+             <AuthenticatedRoute exact path='/' component={DashboardComponent} />
+             <Route path='/login' component={LoginComponent} />
+           </Switch>
+        </Router>
       </div>
     );
   }
-
 }
 
 export default App;

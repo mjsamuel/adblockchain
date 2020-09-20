@@ -135,3 +135,4 @@ build/
 # Data
 extension/data/records.csv
 extension/config.js
+extension/tests/__snapshots__/
