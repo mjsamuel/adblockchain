@@ -12,14 +12,23 @@ chrome.runtime.onInstalled.addListener(function() {
 });
 
 /**
- * Function used to start adblocker script
+ *  Function starts a background script to block ads from the extension
+ *  @return {WebExtensionBlocker} - the started blocking engine
  */
 async function startAdblocker () {
-  WebExtensionBlocker.fromPrebuiltAdsAndTracking().then((blocker) => {
+  return await WebExtensionBlocker.fromPrebuiltAdsOnly().then((blocker) => {
     blocker.enableBlockingInBrowser(browser);
+    return blocker;
   });
 }
 
+/**
+ * Function used to disable the blocker in extension
+ * @param {WebExtensionBlocker} blocker - the existing blocking engine 
+ */
+async function stopAdblocker (blocker) {
+  blocker.disableBlockingInBrowser();
+}
 
 /**
  * Listens for whenever a tab changes
