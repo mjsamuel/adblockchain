@@ -1,5 +1,6 @@
 import { Ethereum } from './services/ethereum.js';
 import { IPFS } from './services/ipfs.js';
+import { WebExtensionBlocker } from '@cliqz/adblocker-webextension';
 var eth = new Ethereum();
 var ipfs = new IPFS();
 
@@ -9,6 +10,16 @@ var ipfs = new IPFS();
 chrome.runtime.onInstalled.addListener(function() {
  chrome.storage.local.set({'paidDomains': []});
 });
+
+/**
+ * Function used to start adblocker script
+ */
+async function startAdblocker () {
+  WebExtensionBlocker.fromPrebuiltAdsAndTracking().then((blocker) => {
+    blocker.enableBlockingInBrowser(browser);
+  });
+}
+
 
 /**
  * Listens for whenever a tab changes
