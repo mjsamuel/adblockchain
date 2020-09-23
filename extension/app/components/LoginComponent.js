@@ -50,7 +50,21 @@ class LoginComponent extends React.Component {
     } 
   }
 
-  registerClicked() {
+  async registerClicked() {
+    const account = await this.eth.createAccount();
+    const data = {
+        'publicKey': account.address,
+        'privateKey': account.privateKey
+    }
+
+    alert(`Here are your account details.\n`
+      + `Please note these down as they will not be presented to you again.\n\n`
+      + `Public key: ${account.address}\n`
+      + `Private key: ${account.privateKey}`)
+
+    chrome.storage.sync.set(data, () => {
+      this.props.history.push(`/`);
+    });
   }
 
   render() {
