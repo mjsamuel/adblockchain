@@ -1,6 +1,7 @@
 import { Ethereum } from './services/ethereum.js';
 import { IPFS } from './services/ipfs.js';
 import { WebExtensionBlocker } from '@cliqz/adblocker-webextension';
+import DashboardComponent from './components/DashboardComponent.js';
 var eth = new Ethereum();
 var ipfs = new IPFS();
 
@@ -10,6 +11,38 @@ var ipfs = new IPFS();
 chrome.runtime.onInstalled.addListener(function() {
  chrome.storage.local.set({'paidDomains': []});
 });
+
+/**
+ * Listens for whenever a tab changes
+ */
+chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
+  const url = changeInfo["url"];
+  const filteredUrl = filterUrl(url);
+  // Checking if a valid URL 
+  if (filteredUrl !== undefined) {
+    transferFunds(filteredUrl);
+  }
+});
+
+/**
+ * Listens for 
+ */
+chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
+
+  // ..
+  // if(loggedIn){
+  //   /// ...
+  //   dashboard = DashboardComponent ...
+  //   if(dashboard.state.balance = 0) {
+  //     disableAdblocker(blocker);
+  //   } else {
+  //     if(adblockerEnabled){
+  //       enableAdblocker();
+  //     }
+  //   }
+  // }  
+})
+
 
 /**
  *  Function starts a background script to block ads from the extension
@@ -26,21 +59,9 @@ async function enableAdblocker () {
  * Function used to disable the blocker in extension
  * @param {WebExtensionBlocker} blocker - the existing blocking engine 
  */
-async function disableAdblocker (blocker) {
+function disableAdblocker (blocker) {
   blocker.disableBlockingInBrowser();
 }
-
-/**
- * Listens for whenever a tab changes
- */
-chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
-  const url = changeInfo["url"];
-  const filteredUrl = filterUrl(url);
-  // Checking if a valid URL 
-  if (filteredUrl !== undefined) {
-    transferFunds(filteredUrl);
-  }
-});
 
 /**
  * Retrieves the wallet address for a particular domain and sends funds to that
