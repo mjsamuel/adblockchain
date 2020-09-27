@@ -1,4 +1,5 @@
 import React from 'react'
+import {withRouter} from 'react-router'
 import moment from 'moment';
 import '../css/DashboardComponent.css'
 import { Ethereum } from '../services/ethereum.js'
@@ -120,4 +121,4 @@ class DashboardComponent extends React.Component {
   }
 }
 
-export default DashboardComponent
+export default withRouter(DashboardComponent);

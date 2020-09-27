@@ -2,8 +2,11 @@ import { Ethereum } from './services/ethereum.js';
 import { IPFS } from './services/ipfs.js';
 import { WebExtensionBlocker } from '@cliqz/adblocker-webextension';
 import DashboardComponent from './components/DashboardComponent.js';
+import { useLocation } from 'react-router-dom';
+
 var eth = new Ethereum();
 var ipfs = new IPFS();
+var blockerEngine = null;
 
 /**
  * Initializes the paid domains array in local storage on install
@@ -28,7 +31,7 @@ chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
  * Listens for 
  */
 chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
-
+  
   // ..
   // if(loggedIn){
   //   /// ...
@@ -46,10 +49,10 @@ chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
 
 /**
  *  Function starts a background script to block ads from the extension
- *  @return {WebExtensionBlocker} - the started blocking engine
+ * 
  */
 async function enableAdblocker () {
-  return await WebExtensionBlocker.fromPrebuiltAdsOnly().then((blocker) => {
+  blockerEngine = await WebExtensionBlocker.fromPrebuiltAdsOnly().then((blocker) => {
     blocker.enableBlockingInBrowser(browser);
     return blocker;
   });
@@ -57,10 +60,11 @@ async function enableAdblocker () {
 
 /**
  * Function used to disable the blocker in extension
- * @param {WebExtensionBlocker} blocker - the existing blocking engine 
  */
-function disableAdblocker (blocker) {
-  blocker.disableBlockingInBrowser();
+function disableAdblocker () {
+  if(blockerEngine){
+    blockerEngine.disableBlockingInBrowser();
+  } 
 }
 
 /**
