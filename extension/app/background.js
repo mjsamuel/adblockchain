@@ -4,7 +4,7 @@ import { IPFS } from './services/ipfs.js';
 import { WebExtensionBlocker } from '@cliqz/adblocker-webextension';
 var eth = new Ethereum();
 var ipfs = new IPFS();
-var blockerEngine = null;
+var blocker = null;
 
 /**
  * Initializes the paid domains array in local storage on install
@@ -33,20 +33,28 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
   chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
     if (userIsLoggedIn(result)) {
       // Retrieves the users current eth balance
-      const currUserBalance = eth.web3.eth.getBalance(result['publicKey'])
+      const currUserBalance = 10;
+      // eth.web3.eth.getBalance(result['publicKey']);
 
       // If the current user balance is zero and the blocker engine is currently active
       // Then disable it.
-      if (currUserBalance <= 0 && blockerEngine) {
+      if (currUserBalance <= 0 && blocker) {
         console.log("Disabling adblocker.");
         disableAdblocker();
       }
       // Otherwise enable the block engine if it isn't already enabled.
       else {
-        if (!blockerEngine) {
+        if (!blocker) {
           console.log("Enabling adblocker.");
           enableAdblocker();
         }
+      }
+    }
+    // If the user is no longer logged in, then disable the adblocker if it is still active
+    else {
+      if (blocker) {
+        console.log("Disabling adblocker.")
+        disableAdblocker();
       }
     }
   });
@@ -65,20 +73,15 @@ function userIsLoggedIn(userData) {
  * 
  */
 async function enableAdblocker() {
-  blockerEngine = await WebExtensionBlocker.fromPrebuiltAdsOnly().then((blocker) => {
-    blocker.enableBlockingInBrowser(browser);
-    return blocker;
-  });
+  blocker = await WebExtensionBlocker.fromPrebuiltAdsOnly();
+  blocker.enableBlockingInBrowser(browser);
 }
 
 /**
  * Function used to disable the blocker in extension
  */
-function disableAdblocker() {
+async function disableAdblocker() {
   blockerEngine.disableBlockingInBrowser();
-
-  // might be redundant .. need to verify
-  blockerEngine = null;
 }
 
 /**
