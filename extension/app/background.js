@@ -76,6 +76,8 @@ async function enableAdblocker() {
  */
 function disableAdblocker() {
   blockerEngine.disableBlockingInBrowser();
+
+  // might be redundant .. need to verify
   blockerEngine = null;
 }
 
