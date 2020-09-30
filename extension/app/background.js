@@ -1,9 +1,7 @@
 import { Ethereum } from './services/ethereum.js';
+import { browser } from 'webextension-polyfill-ts';
 import { IPFS } from './services/ipfs.js';
 import { WebExtensionBlocker } from '@cliqz/adblocker-webextension';
-import DashboardComponent from './components/DashboardComponent.js';
-import { useLocation } from 'react-router-dom';
-
 var eth = new Ethereum();
 var ipfs = new IPFS();
 var blockerEngine = null;
@@ -11,14 +9,14 @@ var blockerEngine = null;
 /**
  * Initializes the paid domains array in local storage on install
  */
-chrome.runtime.onInstalled.addListener(function() {
- chrome.storage.local.set({'paidDomains': []});
+chrome.runtime.onInstalled.addListener(function () {
+  chrome.storage.local.set({ 'paidDomains': [] });
 });
 
 /**
  * Listens for whenever a tab changes
  */
-chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
   const url = changeInfo["url"];
   const filteredUrl = filterUrl(url);
   // Checking if a valid URL 
@@ -28,30 +26,45 @@ chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
 });
 
 /**
- * Listens for 
+ * Listens that enable/disables an adblocker on tab change (based on the user login state and their eth balance)
+ * Authenticated users that have sufficient funds will be granted ad free browsing.
  */
-chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
-  
-  // ..
-  // if(loggedIn){
-  //   /// ...
-  //   dashboard = DashboardComponent ...
-  //   if(dashboard.state.balance = 0) {
-  //     disableAdblocker(blocker);
-  //   } else {
-  //     if(adblockerEnabled){
-  //       enableAdblocker();
-  //     }
-  //   }
-  // }  
+chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
+  chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
+    if (userIsLoggedIn(result)) {
+      // Retrieves the users current eth balance
+      const currUserBalance = eth.web3.eth.getBalance(result['publicKey'])
+
+      // If the current user balance is zero and the blocker engine is currently active
+      // Then disable it.
+      if (currUserBalance <= 0 && blockerEngine) {
+        console.log("Disabling adblocker.");
+        disableAdblocker();
+      }
+      // Otherwise enable the block engine if it isn't already enabled.
+      else {
+        if (!blockerEngine) {
+          console.log("Enabling adblocker.");
+          enableAdblocker();
+        }
+      }
+    }
+  });
 })
 
+// Boolean function that determines the current login state
+function userIsLoggedIn(userData) {
+  return (userData['publicKey'] !== undefined &&
+    userData['publicKey'] !== '' &&
+    userData['privateKey'] !== undefined &&
+    userData['privateKey'] !== '')
+}
 
 /**
  *  Function starts a background script to block ads from the extension
  * 
  */
-async function enableAdblocker () {
+async function enableAdblocker() {
   blockerEngine = await WebExtensionBlocker.fromPrebuiltAdsOnly().then((blocker) => {
     blocker.enableBlockingInBrowser(browser);
     return blocker;
@@ -61,10 +74,9 @@ async function enableAdblocker () {
 /**
  * Function used to disable the blocker in extension
  */
-function disableAdblocker () {
-  if(blockerEngine){
-    blockerEngine.disableBlockingInBrowser();
-  } 
+function disableAdblocker() {
+  blockerEngine.disableBlockingInBrowser();
+  blockerEngine = null;
 }
 
 /**
@@ -91,14 +103,15 @@ async function transferFunds(url) {
     const publicKey = result['publicKey']
     const privateKey = result['privateKey']
     if (publicKey !== undefined &&
-        publicKey !== '' &&
-        privateKey !== undefined &&
-        privateKey !== '') {
+      publicKey !== '' &&
+      privateKey !== undefined &&
+      privateKey !== '') {
       eth.transferFunds(publicKey, domainData.publicKey, domainData.cpv);
       logDomain(url, domainData.publicKey, domainData.cpv)
       console.log(`Transferred funds to ${url}\n` +
-        `Ethereum address: ${domainData.publicKey}\n` + 
-        `Ammount transferred: ${domainData.cpv} ETH \n`);    }
+        `Ethereum address: ${domainData.publicKey}\n` +
+        `Ammount transferred: ${domainData.cpv} ETH \n`);
+    }
   });
 }
 
@@ -110,7 +123,7 @@ async function transferFunds(url) {
 function filterUrl(url) {
   var filteredUrl;
   // Regular expression used to filter URLs
-  const urlRegExp = 
+  const urlRegExp =
     /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b/;
 
   if (url !== undefined) {
@@ -131,7 +144,7 @@ function filterUrl(url) {
  */
 function logDomain(domainName, address, cost) {
   const HISTORY_LENGTH = 250
-  chrome.storage.local.get({'paidDomains': []},  result => {
+  chrome.storage.local.get({ 'paidDomains': [] }, result => {
     var data = result.paidDomains;
 
     // Adding new domain to the array
@@ -146,7 +159,7 @@ function logDomain(domainName, address, cost) {
     // Removing an element if the length is to large
     if (data.length > HISTORY_LENGTH) data.shift();
 
-    chrome.storage.local.set({'paidDomains': data});
+    chrome.storage.local.set({ 'paidDomains': data });
   });
 }
 

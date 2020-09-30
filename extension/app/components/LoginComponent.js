@@ -1,5 +1,4 @@
 import React from 'react'
-import {withRouter} from 'react-router'
 import '../css/LoginComponent.css'
 import { Ethereum } from '../services/ethereum.js'
 
@@ -106,4 +105,4 @@ class LoginComponent extends React.Component {
   }
 }
 
-export default withRouter(LoginComponent);
+export default LoginComponent;
