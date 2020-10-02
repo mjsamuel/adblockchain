@@ -1,7 +1,7 @@
 import { Ethereum } from './services/ethereum.js';
-import { browser } from 'webextension-polyfill-ts';
 import { IPFS } from './services/ipfs.js';
-import { WebExtensionBlocker } from '@cliqz/adblocker-webextension';
+import { browser } from 'webextension-polyfill-ts';
+import { fullLists, WebExtensionBlocker } from '@cliqz/adblocker-webextension';
 var eth = new Ethereum();
 var ipfs = new IPFS();
 var blocker = null;
@@ -16,7 +16,7 @@ chrome.runtime.onInstalled.addListener(function () {
 /**
  * Listens for whenever a tab changes
  */
-chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo) {
   const url = changeInfo["url"];
   const filteredUrl = filterUrl(url);
   // Checking if a valid URL 
@@ -25,11 +25,14 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
   }
 });
 
+
 /**
- * Listens that enable/disables an adblocker on tab change (based on the user login state and their eth balance)
+ * Listens that enable/disables an adblocker on tab reload (based on the user login state and their eth balance)
  * Authenticated users that have sufficient funds will be granted ad free browsing.
  */
-chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener(async function () {
+  if (blocker) console.log(": " + blocker.isBlockingEnabled())
+
   chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
     if (userIsLoggedIn(result)) {
       // Retrieves the users current eth balance
@@ -38,7 +41,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
 
       // If the current user balance is zero and the blocker engine is currently active
       // Then disable it.
-      if (currUserBalance <= 0 && blocker) {
+      if (currUserBalance <= 0 && (blocker && blocker.isBlockingEnabled())) {
         console.log("Disabling adblocker.");
         disableAdblocker();
       }
@@ -52,7 +55,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, tab) {
     }
     // If the user is no longer logged in, then disable the adblocker if it is still active
     else {
-      if (blocker) {
+      if (blocker && blocker.isBlockingEnabled()) {
         console.log("Disabling adblocker.")
         disableAdblocker();
       }
@@ -73,15 +76,23 @@ function userIsLoggedIn(userData) {
  * 
  */
 async function enableAdblocker() {
-  blocker = await WebExtensionBlocker.fromPrebuiltAdsOnly();
-  blocker.enableBlockingInBrowser(browser);
+  blocker = await WebExtensionBlocker.fromLists(fetch, fullLists).then(blockerEngine => {
+    const buffer = blockerEngine.serialize();
+    const restoredBlocker = WebExtensionBlocker.deserialize(buffer);
+
+    restoredBlocker.enableBlockingInBrowser(browser);
+    return restoredBlocker
+  });
+
 }
 
 /**
  * Function used to disable the blocker in extension
  */
 async function disableAdblocker() {
-  blockerEngine.disableBlockingInBrowser();
+  blocker.disableBlockingInBrowser();
+  blocker = null;
+
 }
 
 /**

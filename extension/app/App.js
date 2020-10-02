@@ -1,5 +1,5 @@
 import React from 'react'
-import { Router, Route, Switch,useLocation } from 'react-router-dom'
+import { Router, Route, Switch } from 'react-router-dom'
 import { createMemoryHistory } from 'history'
 
 import AuthenticatedRoute from './components/AuthenticatedRoute.js'
@@ -11,30 +11,23 @@ const ipfs = new IPFS();
 
 class App extends React.Component {
 
-  
 
-  async componentDidMount(){
+
+  async componentDidMount() {
   }
 
 
-  isLoggedIn() {
-    const location = useLocation();
-    
-    React.useEffect(() => {
-      console.log('Location changed')
-    }, [location]);
-  }
-  
+
   render() {
     const history = createMemoryHistory()
 
     return (
       <div className="App">
         <Router history={history}>
-           <Switch>
-             <AuthenticatedRoute exact path='/' component={DashboardComponent} />
-             <Route path='/login' component={LoginComponent} />
-           </Switch>
+          <Switch>
+            <AuthenticatedRoute exact path='/' component={DashboardComponent} />
+            <Route path='/login' component={LoginComponent} />
+          </Switch>
         </Router>
       </div>
     );
