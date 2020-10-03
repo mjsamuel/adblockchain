@@ -13,9 +13,29 @@
     },
     "permissions": [
         "tabs",
-        "storage"
+        "storage",
+        "webRequest",
+        "webRequestBlocking",
+        "http://*/*",
+        "https://*/*"
     ],
     "background": {
-        "scripts": ["background.js"]
-    }
+        "scripts": [
+            "background.js"
+        ]
+    },
+    "content_scripts": [
+        {
+            "match_about_blank": true,
+            "all_frames": true,
+            "js": [
+                "contentScript.js"
+            ],
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "run_at": "document_start"
+        }
+    ]
 }

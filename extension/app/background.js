@@ -76,13 +76,81 @@ function userIsLoggedIn(userData) {
  * 
  */
 async function enableAdblocker() {
-  blocker = await WebExtensionBlocker.fromLists(fetch, fullLists).then(blockerEngine => {
-    const buffer = blockerEngine.serialize();
-    const restoredBlocker = WebExtensionBlocker.deserialize(buffer);
+  console.log('hi')
+  blocker = await WebExtensionBlocker.fromPrebuiltAdsAndTracking();
+  blocker.enableBlockingInBrowser(browser);
 
-    restoredBlocker.enableBlockingInBrowser(browser);
-    return restoredBlocker
+  blocker.on('request-blocked', (request, result) => {
+    // incrementBlockedCounter(request, result);
+    console.log('block', request.url);
   });
+
+  blocker.on('request-redirected', (request, result) => {
+    // incrementBlockedCounter(request, result);
+    console.log('redirect', request.url, result);
+  });
+
+  blocker.on('csp-injected', (request) => {
+    console.log('csp', request.url);
+  });
+
+  blocker.on('script-injected', (script, url) => {
+    console.log('script', script.length, url);
+  });
+
+  blocker.on('style-injected', (style, url) => {
+    console.log('style', url, style.length);
+  });
+
+  blocker.on('html-filtered', (htmlSelectors) => {
+    console.log('html selectors', htmlSelectors);
+  });
+
+  // blocker = WebExtensionBlocker.fromPrebuiltAdsOnly().then((blockerEngine) => {
+  //   const buffer = blockerEngine.serialize();
+  //   const restoredBlocker = WebExtensionBlocker.deserialize(buffer);
+
+  //   restoredBlocker.enableBlockingInBrowser(browser);
+
+  //   restoredBlocker.on('request-blocked', (request, result) => {
+  //     // incrementBlockedCounter(request, result);
+  //     console.log('block', request.url);
+  //   });
+
+  //   restoredBlocker.on('request-redirected', (request, result) => {
+  //     // incrementBlockedCounter(request, result);
+  //     console.log('redirect', request.url, result);
+  //   });
+
+  //   restoredBlocker.on('csp-injected', (request) => {
+  //     console.log('csp', request.url);
+  //   });
+
+  //   restoredBlocker.on('script-injected', (script, url) => {
+  //     console.log('script', script.length, url);
+  //   });
+
+  //   restoredBlocker.on('style-injected', (style, url) => {
+  //     console.log('style', url, style.length);
+  //   });
+
+  //   restoredBlocker.on('html-filtered', (htmlSelectors) => {
+  //     console.log('html selectors', htmlSelectors);
+  //   });
+
+  //   console.log('Ready to roll: ' + restoredBlocker.isBlockingEnabled());
+
+  //   return restoredBlocker;
+  // });
+  // blocker = await WebExtensionBlocker.fromPrebuiltAdsAndTracking().then(blockerEngine => {
+  //   blockerEngine.enableBlockingInBrowser(browser);
+  //   return blockerEngine;
+  //   // const buffer = blockerEngine.serialize();
+  //   // const restoredBlocker = WebExtensionBlocker.deserialize(buffer);
+
+  //   // restoredBlocker.enableBlockingInBrowser(browser);
+  //   // return restoredBlocker
+  // });
 
 }
 
