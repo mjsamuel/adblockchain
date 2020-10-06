@@ -25,6 +25,10 @@ class AuthenticatedRoute extends React.Component {
       } else {
         this.props.history.push(`/login`)
       }
+
+      if (window.innerWidth > 350) {
+         this.props.history.push(`/analytics`)
+      }
     });
   }
 

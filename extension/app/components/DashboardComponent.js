@@ -20,6 +20,7 @@ class DashboardComponent extends React.Component {
     this.updateBalance = this.updateBalance.bind(this);
     this.updateTransactions = this.updateTransactions.bind(this);
     this.changePage = this.changePage.bind(this)
+    this.analyticsClicked = this.analyticsClicked.bind(this)
   }
 
   componentDidMount() {
@@ -73,6 +74,10 @@ class DashboardComponent extends React.Component {
     this.props.history.push(`/login`)
   }
 
+  analyticsClicked() {
+    chrome.tabs.create({ url: "index.html" });
+  }
+
   render() {
     return (
       <>
@@ -107,7 +112,13 @@ class DashboardComponent extends React.Component {
               </tbody>
             </table>
           </>)}
-        <div className="btn-group fill">
+        <div className="btn-group-vertical fill">
+          <button 
+            type="button" 
+            className="btn btn"
+            onClick={this.analyticsClicked}>
+              Analytics
+          </button>
           <button 
             type="button" 
             className="btn btn-danger"
