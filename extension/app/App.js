@@ -20,7 +20,7 @@ class App extends React.Component {
     const history = createMemoryHistory()
 
     return (
-      <div className="App">
+      <>
         <Router history={history}>
            <Switch>
              <AuthenticatedRoute exact path='/' component={DashboardComponent} />
@@ -28,7 +28,7 @@ class App extends React.Component {
              <AuthenticatedRoute exact path='/analytics' component={AnalyticsComponent} />
            </Switch>
         </Router>
-      </div>
+      </>
     );
   }
 }

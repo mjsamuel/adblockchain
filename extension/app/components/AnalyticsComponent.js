@@ -74,16 +74,18 @@ class AnalyticsComponent extends React.Component {
 
   render() {
     return (
-      <>
-        <h2>Analytics Coponents</h2>
-        {this.state.data && 
-          (<Doughnut
-            data={this.state.data}
-            width={400}
-            height={200}
-            options={{ maintainAspectRatio: false }}
-          />)}
-      </>
+      <div className="window">
+        <div className="window-container">
+          <h2>Analytics Coponents</h2>
+          {this.state.data && 
+            (<Doughnut
+              data={this.state.data}
+              width={400}
+              height={200}
+              options={{ maintainAspectRatio: false }}
+            />)}
+          </div>
+      </div>
     );
   }
 }

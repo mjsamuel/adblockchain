@@ -1,4 +1,8 @@
-.App {
+.popup {
+  width: 300px;
+}
+
+.popup-container {
   margin: auto;
   width: 90%;
   padding-top: 16px;
