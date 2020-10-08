@@ -1,10 +1,29 @@
 import { Ethereum } from './services/ethereum.js';
 import { IPFS } from './services/ipfs.js';
-import { browser } from 'webextension-polyfill-ts';
-import { fullLists, WebExtensionBlocker } from '@cliqz/adblocker-webextension';
 var eth = new Ethereum();
 var ipfs = new IPFS();
-var blocker = null;
+const blockedUrls = new Map();
+const blocker = () => ({ cancel: true });
+
+var adblockFilters = [
+  "*://*.doubleclick.net/*",
+  "*://partner.googleadservices.com/*",
+  "*://*.googleadservices.com/*",
+  "*://*.googlesyndication.com/*",
+  "*://*.google-analytics.com/*",
+  "*://creative.ak.fbcdn.net/*",
+  "*://*.adbrite.com/*",
+  "*://*.exponential.com/*",
+  "*://*.quantserve.com/*",
+  "*://*.scorecardresearch.com/*",
+  "*://*.zedo.com/*",
+  "*://mrjb7hvcks.com/*",
+  "*://mr2cnjuh34jb.com/*",
+  "*://track.wg-aff.com/*",
+  "*://meowpushnot.com/*"
+]
+
+
 
 /**
  * Initializes the paid domains array in local storage on install
@@ -26,42 +45,47 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo) {
 });
 
 
-/**
- * Listens that enable/disables an adblocker on tab reload (based on the user login state and their eth balance)
- * Authenticated users that have sufficient funds will be granted ad free browsing.
- */
-chrome.tabs.onUpdated.addListener(async function () {
-  if (blocker) console.log(": " + blocker.isBlockingEnabled())
+chrome.webRequest.onBeforeRequest.addListener(
+  filter_callback,
+  { urls: adblockFilters },
+  ["blocking"]
+);
 
-  chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
-    if (userIsLoggedIn(result)) {
-      // Retrieves the users current eth balance
-      const currUserBalance = 10;
-      // eth.web3.eth.getBalance(result['publicKey']);
-
-      // If the current user balance is zero and the blocker engine is currently active
-      // Then disable it.
-      if (currUserBalance <= 0 && (blocker && blocker.isBlockingEnabled())) {
-        console.log("Disabling adblocker.");
-        disableAdblocker();
-      }
-      // Otherwise enable the block engine if it isn't already enabled.
-      else {
-        if (!blocker) {
-          console.log("Enabling adblocker.");
-          enableAdblocker();
-        }
-      }
-    }
-    // If the user is no longer logged in, then disable the adblocker if it is still active
-    else {
-      if (blocker && blocker.isBlockingEnabled()) {
-        console.log("Disabling adblocker.")
-        disableAdblocker();
-      }
+async function filter_callback(details) {
+  let cancelValue = await chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
+    if (!userIsLoggedIn(result)) {
+      return false;
+    } else {
+      console.log("Blocking: " + details.url);
+      return true;
     }
   });
-})
+
+  console.log(cancelValue);
+  return { cancel: cancelValue };
+}
+
+// if (chrome.webRequest.onBeforeRequest.hasListener(filter_callback)) {
+//   console.log('yes')
+// }
+
+
+
+// chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo) {
+//   chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
+//     // Retrieves the users current eth balance
+//     const currUserBalance = 10;
+//     // const currUserBalance = eth.web3.eth.getBalance(result['publicKey']);
+
+//     if (userIsLoggedIn(result) && currUserBalance <= 0) {
+//       chrome.webRequest.onBeforeRequest.addListener(
+//         function (details) { return { cancel: true }; },
+//         { urls: filters },
+//         ["blocking"]
+//       );
+//     }
+//   });
+// })
 
 // Boolean function that determines the current login state
 function userIsLoggedIn(userData) {
@@ -69,98 +93,6 @@ function userIsLoggedIn(userData) {
     userData['publicKey'] !== '' &&
     userData['privateKey'] !== undefined &&
     userData['privateKey'] !== '')
-}
-
-/**
- *  Function starts a background script to block ads from the extension
- * 
- */
-async function enableAdblocker() {
-  console.log('hi')
-  blocker = await WebExtensionBlocker.fromPrebuiltAdsAndTracking();
-  blocker.enableBlockingInBrowser(browser);
-
-  blocker.on('request-blocked', (request, result) => {
-    // incrementBlockedCounter(request, result);
-    console.log('block', request.url);
-  });
-
-  blocker.on('request-redirected', (request, result) => {
-    // incrementBlockedCounter(request, result);
-    console.log('redirect', request.url, result);
-  });
-
-  blocker.on('csp-injected', (request) => {
-    console.log('csp', request.url);
-  });
-
-  blocker.on('script-injected', (script, url) => {
-    console.log('script', script.length, url);
-  });
-
-  blocker.on('style-injected', (style, url) => {
-    console.log('style', url, style.length);
-  });
-
-  blocker.on('html-filtered', (htmlSelectors) => {
-    console.log('html selectors', htmlSelectors);
-  });
-
-  // blocker = WebExtensionBlocker.fromPrebuiltAdsOnly().then((blockerEngine) => {
-  //   const buffer = blockerEngine.serialize();
-  //   const restoredBlocker = WebExtensionBlocker.deserialize(buffer);
-
-  //   restoredBlocker.enableBlockingInBrowser(browser);
-
-  //   restoredBlocker.on('request-blocked', (request, result) => {
-  //     // incrementBlockedCounter(request, result);
-  //     console.log('block', request.url);
-  //   });
-
-  //   restoredBlocker.on('request-redirected', (request, result) => {
-  //     // incrementBlockedCounter(request, result);
-  //     console.log('redirect', request.url, result);
-  //   });
-
-  //   restoredBlocker.on('csp-injected', (request) => {
-  //     console.log('csp', request.url);
-  //   });
-
-  //   restoredBlocker.on('script-injected', (script, url) => {
-  //     console.log('script', script.length, url);
-  //   });
-
-  //   restoredBlocker.on('style-injected', (style, url) => {
-  //     console.log('style', url, style.length);
-  //   });
-
-  //   restoredBlocker.on('html-filtered', (htmlSelectors) => {
-  //     console.log('html selectors', htmlSelectors);
-  //   });
-
-  //   console.log('Ready to roll: ' + restoredBlocker.isBlockingEnabled());
-
-  //   return restoredBlocker;
-  // });
-  // blocker = await WebExtensionBlocker.fromPrebuiltAdsAndTracking().then(blockerEngine => {
-  //   blockerEngine.enableBlockingInBrowser(browser);
-  //   return blockerEngine;
-  //   // const buffer = blockerEngine.serialize();
-  //   // const restoredBlocker = WebExtensionBlocker.deserialize(buffer);
-
-  //   // restoredBlocker.enableBlockingInBrowser(browser);
-  //   // return restoredBlocker
-  // });
-
-}
-
-/**
- * Function used to disable the blocker in extension
- */
-async function disableAdblocker() {
-  blocker.disableBlockingInBrowser();
-  blocker = null;
-
 }
 
 /**

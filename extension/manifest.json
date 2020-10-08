@@ -16,8 +16,7 @@
         "storage",
         "webRequest",
         "webRequestBlocking",
-        "http://*/*",
-        "https://*/*"
+        "<all_urls>"
     ],
     "background": {
         "scripts": [
