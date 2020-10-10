@@ -77,26 +77,7 @@ if (chrome.webRequest.onBeforeRequest.hasListener(adblock_callback)) {
       }
     }
   })
-
 }
-
-
-
-// chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo) {
-//   chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
-//     // Retrieves the users current eth balance
-//     const currUserBalance = 10;
-//     // const currUserBalance = eth.web3.eth.getBalance(result['publicKey']);
-
-//     if (userIsLoggedIn(result) && currUserBalance <= 0) {
-//       chrome.webRequest.onBeforeRequest.addListener(
-//         function (details) { return { cancel: true }; },
-//         { urls: filters },
-//         ["blocking"]
-//       );
-//     }
-//   });
-// })
 
 // Boolean function that determines the current login state
 function userIsLoggedIn(userData) {
