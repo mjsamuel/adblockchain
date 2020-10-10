@@ -53,7 +53,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 /**
  * Named callback function for adblocker that returns a blocking response (used to determine the lifecycle of the request)
  * Returns true meaning that the request is cancelled
- * @param {*} details 
+ * @param {*} details: an object that contains info for the current callback request
  */
 async function adblock_callback(details) {
   console.log("Blocking: " + details.url);
@@ -79,12 +79,16 @@ if (chrome.webRequest.onBeforeRequest.hasListener(adblock_callback)) {
   })
 }
 
-// Boolean function that determines the current login state
-function userIsLoggedIn(userData) {
-  return (userData['publicKey'] !== undefined &&
-    userData['publicKey'] !== '' &&
-    userData['privateKey'] !== undefined &&
-    userData['privateKey'] !== '')
+/**
+ * Function that determines the current user login state based on the local storage data 
+ * Public/private key variables are set once a user logs in.
+ * @param {*} storage: local storage data array
+ */
+function userIsLoggedIn(storage) {
+  return (storage['publicKey'] !== undefined &&
+    storage['publicKey'] !== '' &&
+    storage['privateKey'] !== undefined &&
+    storage['privateKey'] !== '')
 }
 
 /**
