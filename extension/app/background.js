@@ -2,9 +2,6 @@ import { Ethereum } from './services/ethereum.js';
 import { IPFS } from './services/ipfs.js';
 var eth = new Ethereum();
 var ipfs = new IPFS();
-const blockedUrls = new Map();
-const blocker = () => ({ cancel: true });
-
 var adblockFilters = [
   "*://*.doubleclick.net/*",
   "*://partner.googleadservices.com/*",
@@ -22,8 +19,6 @@ var adblockFilters = [
   "*://track.wg-aff.com/*",
   "*://meowpushnot.com/*"
 ]
-
-
 
 /**
  * Initializes the paid domains array in local storage on install
@@ -44,30 +39,46 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo) {
   }
 });
 
-
+/** 
+ * Listener (when active) serves as an adblocker.
+ * Uses the webRequest API to intercept and filter out requests before they occur.
+ * Uses a list ('adblockFilters') of URL patterns (of known advertisements) to match requests to block.
+ */
 chrome.webRequest.onBeforeRequest.addListener(
-  filter_callback,
+  adblock_callback,
   { urls: adblockFilters },
   ["blocking"]
 );
 
-async function filter_callback(details) {
-  let cancelValue = await chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
-    if (!userIsLoggedIn(result)) {
-      return false;
-    } else {
-      console.log("Blocking: " + details.url);
-      return true;
-    }
-  });
-
-  console.log(cancelValue);
-  return { cancel: cancelValue };
+/**
+ * Named callback function for adblocker that returns a blocking response (used to determine the lifecycle of the request)
+ * Returns true meaning that the request is cancelled
+ * @param {*} details 
+ */
+async function adblock_callback(details) {
+  console.log("Blocking: " + details.url);
+  return { cancel: true };
 }
 
-// if (chrome.webRequest.onBeforeRequest.hasListener(filter_callback)) {
-//   console.log('yes')
-// }
+// If the adblocker listener is currently active
+if (chrome.webRequest.onBeforeRequest.hasListener(adblock_callback)) {
+  // Access local storage to check if the user is logged in
+  chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
+    // If the user is currently logged in
+    if (userIsLoggedIn(result)) {
+      // Retrieves the users current eth balance
+      const currUserBalance = eth.web3.eth.getBalance(result['publicKey']);
+      // const currUserBalance = 0;
+
+      // If the user currently has an empty balance
+      if (currUserBalance <= 0) {
+        // Remove the adblocker listener
+        chrome.webRequest.onBeforeRequest.removeListener(adblock_callback);
+      }
+    }
+  })
+
+}
 
 
 
