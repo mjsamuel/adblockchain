@@ -5,15 +5,18 @@ import { createMemoryHistory } from 'history'
 import AuthenticatedRoute from './components/AuthenticatedRoute.js'
 import LoginComponent from './components/LoginComponent.js'
 import DashboardComponent from './components/DashboardComponent.js'
-
 import './css/App.css'
 import { IPFS } from './services/ipfs.js'
 const ipfs = new IPFS();
 
 class App extends React.Component {
 
-  async componentDidMount(){
+
+
+  async componentDidMount() {
   }
+
+
 
   render() {
     const history = createMemoryHistory()
@@ -21,10 +24,10 @@ class App extends React.Component {
     return (
       <div className="App">
         <Router history={history}>
-           <Switch>
-             <AuthenticatedRoute exact path='/' component={DashboardComponent} />
-             <Route path='/login' component={LoginComponent} />
-           </Switch>
+          <Switch>
+            <AuthenticatedRoute exact path='/' component={DashboardComponent} />
+            <Route path='/login' component={LoginComponent} />
+          </Switch>
         </Router>
       </div>
     );
