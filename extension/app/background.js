@@ -60,7 +60,9 @@ async function adblock_callback(details) {
   return { cancel: true };
 }
 
-// If the adblocker listener is currently active
+/**
+ * If the adblocker is currently active then this script is used to determine whether adblock listener should be disabled
+ */
 if (chrome.webRequest.onBeforeRequest.hasListener(adblock_callback)) {
   // Access local storage to check if the user is logged in
   chrome.storage.sync.get(['publicKey', 'privateKey'], result => {
