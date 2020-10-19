@@ -12,13 +12,8 @@ import { IPFS } from './services/ipfs.js'
 const ipfs = new IPFS();
 
 class App extends React.Component {
-
-  async componentDidMount(){
-  }
-
   render() {
     const history = createMemoryHistory()
-
     return (
       <>
         <Router history={history}>

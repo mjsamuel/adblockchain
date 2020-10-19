@@ -9,7 +9,8 @@ const config = {
   devtool: "cheap-module-source-map",
   entry: {
     app: path.join(__dirname, "./static/index.js"),
-    background: path.join(__dirname, "./app/background.js")
+    background: path.join(__dirname, "./app/background.js"),
+    contentScript: path.join(__dirname, "./app/content-script.js")
   },
   output: {
     path: path.resolve(__dirname, "./build"),
@@ -33,8 +34,8 @@ const config = {
     }),
     new CopyPlugin({
       patterns: [
-        {from: 'app/images', to: 'images'},
-        {from: 'app/css', to: 'css'}
+        { from: 'app/images', to: 'images' },
+        { from: 'app/css', to: 'css' }
       ]
     }),
     new WebpackExtensionManifestPlugin({
