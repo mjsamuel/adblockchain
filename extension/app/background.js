@@ -117,9 +117,9 @@ async function transferFunds(url) {
     const publicKey = result['publicKey']
     const privateKey = result['privateKey']
     if (publicKey !== undefined &&
-      publicKey !== '' &&
-      privateKey !== undefined &&
-      privateKey !== '') {
+        publicKey !== '' &&
+        privateKey !== undefined &&
+        privateKey !== '') {
       eth.transferFunds(publicKey, domainData.publicKey, domainData.cpv);
       logDomain(url, domainData.publicKey, domainData.cpv)
       console.log(`Transferred funds to ${url}\n` +
@@ -147,7 +147,6 @@ function filterUrl(url) {
 
   return filteredUrl;
 }
-
 
 /**
  * Logs each site that a user transfers funds to in Chrome's local storage

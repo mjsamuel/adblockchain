@@ -18,3 +18,7 @@
   font-weight: 700;
   font-size: 36px;
 }
+
+.btn-group-vertical.fill {
+  display: flex;
+}

@@ -69,52 +69,54 @@ class LoginComponent extends React.Component {
 
   render() {
     return (
-      <>
-        <h2>Login</h2>
-        {this.state.errors.length !== 0 && (
-          <div className="alert alert-danger" role="alert">
-            <b>Error/s</b>:
-            <ul>
-              {this.state.errors.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
-            </ul>
-          </div>)}
-        <form>
-          <div className="form-group">
-            <input 
-              type="text" 
-              className="form-control" 
-              placeholder="Ethereum Public Key" 
-              name="publicKey" 
-              value={this.state.publicKey} 
-              onChange={this.handleChange} />
-          </div>
-          <div className="form-group">
-            <input 
-              type="password" 
-              className="form-control" 
-              placeholder="Ethereum Private Key" 
-              name="privateKey" 
-              value={this.state.privateKey} 
-              onChange={this.handleChange} />
-          </div>
-          <div className="btn-group fill">
-            <button 
-              type="button" 
-              className="btn btn-primary"
-              onClick={this.submitClicked}>
-                Submit
-            </button>
-            <button 
-              type="button" 
-              className="btn btn-success"
-              onClick={this.registerClicked}>
-                Register
-            </button>
-          </div>
-        </form>
-      </>
+      <div className="popup">
+        <div className="popup-container">
+          <h2>Login</h2>
+          {this.state.errors.length !== 0 && (
+            <div className="alert alert-danger" role="alert">
+              <b>Error/s</b>:
+              <ul>
+                {this.state.errors.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </div>)}
+          <form>
+            <div className="form-group">
+              <input 
+                type="text" 
+                className="form-control" 
+                placeholder="Ethereum Public Key" 
+                name="publicKey" 
+                value={this.state.publicKey} 
+                onChange={this.handleChange} />
+            </div>
+            <div className="form-group">
+              <input 
+                type="password" 
+                className="form-control" 
+                placeholder="Ethereum Private Key" 
+                name="privateKey" 
+                value={this.state.privateKey} 
+                onChange={this.handleChange} />
+            </div>
+            <div className="btn-group fill">
+              <button 
+                type="button" 
+                className="btn btn-primary"
+                onClick={this.submitClicked}>
+                  Submit
+              </button>
+              <button 
+                type="button" 
+                className="btn btn-success"
+                onClick={this.registerClicked}>
+                  Register
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     );
   }
 }
