@@ -33,8 +33,8 @@ const config = {
     }),
     new CopyPlugin({
       patterns: [
-        {from: 'app/images', to: 'images'},
-        {from: 'app/css', to: 'css'}
+        { from: 'app/images', to: 'images' },
+        { from: 'app/css', to: 'css' }
       ]
     }),
     new WebpackExtensionManifestPlugin({
