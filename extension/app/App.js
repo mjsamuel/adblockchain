@@ -8,8 +8,6 @@ import DashboardComponent from './components/DashboardComponent.js'
 import AnalyticsComponent from './components/AnalyticsComponent.js'
 
 import './css/App.css'
-import { IPFS } from './services/ipfs.js'
-const ipfs = new IPFS();
 
 class App extends React.Component {
   render() {

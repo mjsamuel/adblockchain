@@ -4,32 +4,29 @@ import { IPNS_ADDRESS, IPNS_KEY } from '../../config.js';
 
 export class IPFS {
     constructor() {
+        this.LOCAL_DATABASE_KEY = "localDatabase"
         this.ipfs = ipfsClient({ host: 'localhost', port: 5001, protocol: 'http' });
         this.decoder = new TextDecoder('utf-8');
     }
 
     /**
-     * Gets the Ethereum public key, private key and cost per view from our IPFS 
-     * database
+     * Retrieves the Ethereum public key, private key and cost per view from our 
+     # local cache. If this data doesn't exist then check the IPFS instead.
      * @param {String} domainName - the domain that you want the public key of  
      * @return {Object} - the corresponding domain object
      */
     async getDomainData(domainName) {
         // First attempt to retrieve the domain data from local storage
-        const cachedData = localStorage.getItem(domainName);
+        var domainData = await this.getLocalDomainData(domainName)
 
-        // If successful, return the cached data
-        if(cachedData) {
-            return cachedData;
-        } 
-        // Else search the database for it
-        else {
-            // Retrieve the entire database as a string
+        // If data doesn't exist in local storage then consult IPFS
+        if(domainData == null) {
             const database = await this.getDatabse();
-            const domainData = database[domainName];
-            return domainData;
+            domainData = database[domainName];
         }
-    }
+
+        return domainData;
+    } 
 
     /**
      * Retrieves the most recent revision of the database using IPNS
@@ -61,23 +58,21 @@ export class IPFS {
      * @return {Object} - the newly created domain object
      */
     async addDomain(domainName, publicKey, privateKey) {
-        // Retrieve the entire database as a string
+        // Retrieve the entire IPFS database and add the new domain
         var database = await this.getDatabse();
-        
-        // Add the domain data to the database and stringify
         database[domainName] = {
             "publicKey": publicKey,
             "privateKey": privateKey,
             "cpv": 0.20
         }
 
-        // Convert to JSON string and push the changes to the database
+        // Convert JSON to string and push the changes to the IPFS database
         const databaseString = JSON.stringify(database);
         this.updateDatabase(databaseString);
         
-        // Store entry into local storage
-        localStorage.setItem(domainName, databaseString);
-        
+        // Update local storage as well
+        this.updateLocalDatabase(databaseString)
+
         return database[domainName];
     }
 
@@ -87,22 +82,15 @@ export class IPFS {
      * @param {Int} cost - the updated cost-per-view for that domain
      */
     async updateCost(domainName, cost) {
-        // Retrieve the current data for the given domain
-        const domainData = JSON.parse(await this.getDomainData(domainName));
-        
-        // Update the CPV value locally
-        domainData[domainName].cpv = cost;
-        
-        // Retrieve the latest data and replace the entry with our updated domain data
-        const currentData = await this.getDatabse();
-        currentData[domainName] = domainData;
+        var database = await this.getDatabse();
+        database[database].cpv = cost
 
-        // Convert the updated data object into a JSON string before adding the changes to the database
-        const updatedData = JSON.stringify(currentData);
-        this.updateDatabase(updatedData);
-
-        // Update entry into local storage (or creates it if it no longer exists)
-        localStorage.setItem(domainName, updatedData);
+        // Convert JSON to string and push the changes to the IPFS database
+        const databaseString = JSON.stringify(database);
+        this.updateDatabase(databaseString);
+        
+        // Update local storage as well
+        this.updateLocalDatabase(databaseString)
     }
 
     /**
@@ -118,10 +106,22 @@ export class IPFS {
         await this.ipfs.name.publish(newIpfsAddress.path, ipnsOptions);
     }
 
+    async getLocalDomainData(domainData) {
+        const databaseString = await localStorage.getItem(this.LOCAL_DATABASE_KEY);
+        const database = JSON.parse(databaseString);
+
+        return database[domainData]
+    }
+
+    async updateLocalDatabase(databaseString) {
+        localStorage.setItem(this.LOCAL_DATABASE_KEY, databaseString);
+    }
+
     /**
-     * Helper function to clear the IPFS database
+     * Helper function to clear the IPFS and local database
      */
     async clearDatabase() {
         this.updateDatabase('{}');
+        this.updateLocalDatabase('{}');
     }
 }
