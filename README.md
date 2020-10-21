@@ -5,7 +5,7 @@
     <img src="https://travis-ci.com/mjsamuel/blockchain.svg?token=8bnx6syKrM5BbM1FTCfx&branch=develop"/><br>
   </h1>
   <strong>RMIT Capstone Project<br></strong>
-  <sub>Brendan Rossi, Liam Jeynes and Matthew Samuel</sub>
+  <sub>Edward Rossi, Liam Jeynes and Matthew Samuel</sub>
 </div>
 
 ## Dependencies
