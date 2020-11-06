@@ -8,6 +8,10 @@
   flex: 1
 }
 
+.page-link {
+  user-select:none;
+}
+
 .table tr:first-child td {
   border-top: none;
 }

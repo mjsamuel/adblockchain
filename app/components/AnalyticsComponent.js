@@ -7,38 +7,43 @@ class AnalyticsComponent extends React.Component {
     super(props)
 
     this.state = {
-      data: null
+      topSitesData: null,
+      monthtlySpendingData: null
     }
 
-    this.updateStats = this.updateStats.bind(this)
-    this.parseData = this.parseData.bind(this)
+    this.updateTopSites = this.updateTopSites.bind(this);
+    this.parseTopSiteData = this.parseTopSiteData.bind(this);
+
+    this.updateMonthlySpending = this.updateMonthlySpending.bind(this);
+    this.parseMonthlySpending = this.parseMonthlySpending.bind(this);
   }
 
   componentDidMount() {
-    this.updateStats()
+    this.updateTopSites();
+    this.updateMonthlySpending();
   }
 
-  updateStats() {
+  updateTopSites() {
     chrome.storage.local.get({'paidDomains': []}, result => {
-      let data = result.paidDomains
-      let parsedData = this.parseData(data) 
+      let data = result.paidDomains;
+      let topSitesData = this.parseTopSiteData(data);
+      let monthlySpendingData = this.parseMonthlySpending(data);
 
       this.setState({
-        data: {
-          labels: parsedData.domains,
+        topSitesData: {
+          labels: topSitesData.domains,
           datasets: [{
-            data: parsedData.costs,
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
-            hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+            data: topSitesData.costs,
+            backgroundColor: ['#99B898', '#FECEA8', '#FF847C','#E84A5F']
           }]
         }
       }, () => {
-        console.log("UPDATED GRAPH")
+        console.log("Top sites updated")
       })
     });
   }
 
-  parseData(data) {
+  parseTopSiteData(data) {
     // Calculating the total cost for each domain
     var totalCosts = {}
     data.forEach(function(entry) {
@@ -59,10 +64,10 @@ class AnalyticsComponent extends React.Component {
     items = items.slice(0, 5)
 
     // Splitting domain names and costs into separate arrays
-    var domains = items.map(function(value,index) { 
+    let domains = items.map(function(value,index) { 
       return value[0]; 
     });
-    var costs = items.map(function(value,index) { 
+    let costs = items.map(function(value,index) { 
       return value[1].toFixed(2);
     });
 
@@ -72,19 +77,50 @@ class AnalyticsComponent extends React.Component {
     }
   }
 
+  updateMonthlySpending() {
+    
+  }
+
+  parseMonthlySpending() {
+    
+  }
+
   render() {
     return (
       <div className="window">
-        <div className="window-container">
-          <h2>Analytics</h2>
-          {this.state.data && 
-            (<Doughnut
-              data={this.state.data}
-              width={400}
-              height={200}
-              options={{ maintainAspectRatio: false }}
-            />)}
+        <h2>Analytics</h2>
+
+        <div className="tile">
+          <h2>Monthly spending:</h2>
+          {this.state.monthtlySpendingData && 
+            (<br />)
+          }
+        </div>
+
+        <div>
+          <div className="tile split-tile">
+            <h2>Whatever man:</h2>
           </div>
+
+          <div className="tile split-tile">
+            <h2>Top 5 Sites:</h2>
+            {this.state.topSitesData && 
+              (<Doughnut
+                data={this.state.topSitesData}
+                width={400}
+                height={200}
+                options={{
+                  maintainAspectRatio: false,
+                  legend: {
+                    align: 'start',
+                    position: 'bottom',
+                    labels: { boxWidth: 25 }
+                  }
+                }}
+              />)
+            }
+          </div>
+        </div>
       </div>
     );
   }
