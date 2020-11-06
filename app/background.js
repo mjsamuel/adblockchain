@@ -21,7 +21,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo) {
   const url = changeInfo["url"];
   const filteredUrl = util.filterUrl(url);
   // Checking if a valid URL 
-  if (filteredUrl !== undefined) {
+  if (filteredUrl !== null) {
     transferFunds(filteredUrl);
   }
 });

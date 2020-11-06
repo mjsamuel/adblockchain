@@ -76,7 +76,7 @@ class AnalyticsComponent extends React.Component {
     return (
       <div className="window">
         <div className="window-container">
-          <h2>Analytics Coponents</h2>
+          <h2>Analytics</h2>
           {this.state.data && 
             (<Doughnut
               data={this.state.data}

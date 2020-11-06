@@ -17,14 +17,13 @@ export function userIsLoggedIn(keys) {
  * @return {String} - the filtered URL if valid, else undefined
  */
 export function filterUrl(url) {
-  var filteredUrl;
+  var filteredUrl = null;
   // Regular expression used to filter URLs
   const urlRegExp =
-    /[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=-]{2,256}\.[a-z]{2,6}\b/;
+    /https?:\/\/(?:www\.)?[?a-zA-Z0-9@:%._\+~#=-]{2,256}\.[a-z]{2,6}\b/;
 
   if (url !== undefined) {
-    var temp = (url.match(urlRegExp) || []).join('');
-    if (temp !== '') filteredUrl = temp;
+    filteredUrl = urlRegExp.exec(url)
   }
 
   return filteredUrl;
