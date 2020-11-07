@@ -129,10 +129,7 @@ Icon
 Network Trash Folder
 Temporary Items
 
-# Truffle
-build/
-
 # Data
-extension/data/records.csv
-extension/config.js
-extension/tests/__snapshots__/
+config.js
+tests/__snapshots__/
+build
