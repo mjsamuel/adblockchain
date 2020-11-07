@@ -86,7 +86,7 @@ async function transferFunds(url) {
  * @param {Number} cost - the amount of money that was transferred in ETH
  */
 function logDomain(domainName, address, cost) {
-  const HISTORY_LENGTH = 250
+  const HISTORY_LENGTH = 10000
   chrome.storage.local.get({ 'paidDomains': [] }, result => {
     var data = result.paidDomains;
 

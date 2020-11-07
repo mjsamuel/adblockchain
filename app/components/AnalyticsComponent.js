@@ -8,21 +8,23 @@ class AnalyticsComponent extends React.Component {
 
     this.state = {
       topSitesData: null,
-      monthtlySpendingData: null
+      dailySpendingData: null,
+      totalMonthlySpending: null
     }
 
     this.parseTopSiteData = this.parseTopSiteData.bind(this);
-    this.parseMonthlySpending = this.parseMonthlySpending.bind(this);
+    this.parseDailySpending = this.parseDailySpending.bind(this);
 
     this.renderTopSites = this.renderTopSites.bind(this);
+    this.renderDailySpending = this.renderDailySpending.bind(this);
     this.renderMonthlySpending = this.renderMonthlySpending.bind(this);
   }
 
   componentDidMount() {
     chrome.storage.local.get({'paidDomains': []}, result => {
       let data = result.paidDomains;
-      let topSitesData = this.parseTopSiteData(data);
-      let monthlySpendingData = this.parseMonthlySpending(data);
+      this.parseTopSiteData(data);
+      this.parseDailySpending(data);
     });
   }
 
@@ -62,17 +64,16 @@ class AnalyticsComponent extends React.Component {
           backgroundColor: ['#99B898', '#FECEA8', '#FF847C','#E84A5F']
         }]
       }
-    }, () => {
-      console.log("Top sites updated")
     });
   }
 
-  parseMonthlySpending(data) {
+  parseDailySpending(data) {
     let startDate = new Date();
     startDate.setDate(startDate.getDate() - 30);
     let endDate = new Date();
 
     // Calculating the amount spent per day in a 30 day period
+    var totalMonthlySpending = 0
     var spending = {}
     data.forEach(function(transaction) {
       let date = new Date(transaction.time);
@@ -83,6 +84,8 @@ class AnalyticsComponent extends React.Component {
         } else {
           spending[label] = transaction.cost
         }
+        // Also calculating the total spent per month while we're here
+        totalMonthlySpending += transaction.cost
       }
     });
 
@@ -104,15 +107,14 @@ class AnalyticsComponent extends React.Component {
     });
 
     this.setState({
-      monthtlySpendingData: {
+      totalMonthlySpending: totalMonthlySpending,
+      dailySpendingData: {
         labels: dates,
         datasets: [{
           data: costs,
           backgroundColor: '#99b898bf'
         }]
       }
-    }, () => {
-      console.log("Monthly spending updated");
     });
   }
 
@@ -120,9 +122,8 @@ class AnalyticsComponent extends React.Component {
     return (
       <Doughnut
         data={ this.state.topSitesData }
-        height={ 200 }
+        height={ 370 }
         options={{
-          maintainAspectRatio: false,
           legend: {
             align: 'start',
             position: 'bottom',
@@ -133,15 +134,13 @@ class AnalyticsComponent extends React.Component {
     );
   }
 
-  renderMonthlySpending() {
+  renderDailySpending() {
     return (
       <Line 
-        data={ this.state.monthtlySpendingData }
+        data={ this.state.dailySpendingData }
+        height={ 175 }
         options={{
-          maintainAspectRatio: false,
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           tooltips: {
             callbacks: {
               label: (item) => `${item.yLabel} ETH`,
@@ -152,21 +151,30 @@ class AnalyticsComponent extends React.Component {
     );
   }
 
+  renderMonthlySpending() {
+    return (
+      <h1 className="monthly-spending">
+        {this.state.totalMonthlySpending.toFixed(4)}<br />ETH
+      </h1>
+    );
+  }
+
   render() {
     return (
       <div className="window">
         <h2>Analytics</h2>
         <div className="tile">
-          <h2>Your past month:</h2>
-          {this.state.monthtlySpendingData && this.renderMonthlySpending()}
+          <h2>Daily spending:</h2>
+          {this.state.dailySpendingData && this.renderDailySpending()}
         </div>
-        <div>
-          <div className="tile split-tile">
-            <h2>Whatever man:</h2>
-          </div>
+        <div className="split-tile-container">
           <div className="tile split-tile">
             <h2>Top 5 Sites:</h2>
             {this.state.topSitesData && this.renderTopSites()}
+          </div>
+          <div className="tile split-tile">
+            <h2>Total monthly spending:</h2>
+            {this.state.totalMonthlySpending && this.renderMonthlySpending()}
           </div>
         </div>
       </div>
