@@ -1,6 +1,6 @@
 <div align="center">
   <h1>
-    <img src="/images/ethereum_logo?raw=true" alt="Ethereum Logo" height="125"><br>
+    <img src="/images/ethereum_logo.png?raw=true" alt="Ethereum Logo" height="125"><br>
     Adblockchain<br>
     <img src="https://travis-ci.com/mjsamuel/adblockchain.svg?token=8bnx6syKrM5BbM1FTCfx&branch=master"/><br>
   </h1>
